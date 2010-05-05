@@ -1,4 +1,4 @@
-export PATH=/opt/local/bin:/opt/local/sbin:/Developer/usr/bin:$PATH
+export PATH=/opt/local/bin:/opt/local/sbin:/Developer/usr/bin:~/.gitscripts:$PATH
 
 export MANPATH=$MANPATH
 
