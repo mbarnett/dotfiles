@@ -1,23 +1,23 @@
 require 'rake'
 
-desc "install the dot files into user's home directory"
+task :default => [:install]
 
 task :install do
   Dir['*'].each do |file|
     next if file == 'Rakefile'  
     if File.exist?(File.join(ENV['HOME'], ".#{file}"))
-        replace_file(file)
+      replace file
     else
-      link_file(file)
+      link file
     end
   end
 end
 
-def replace_file(file)
+def replace(file)
 	system "rm \"$HOME/.#{file}\""
-  link_file(file)
+  link file
 end
 
-def link_file(file)
+def link(file)
     system "ln -s \"$PWD/#{file}\" \"$HOME/.#{file}\""
 end
