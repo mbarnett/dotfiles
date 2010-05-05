@@ -7,7 +7,16 @@ export LSCOLORS=ExFxCxDxBxegedabagacad
 
 export EDITOR="mate -w"
 
-export PS1='\[\e[1;30m\]\h: \w\$\[\e[0m\] '
+function parse_git_branch {
+  ref=$(git symbolic-ref HEAD 2> /dev/null) || return
+  echo " ("${ref#refs/heads/}")"
+}
+
+BLACK="\[\e[1;30m\]"
+RESET="\[\e[0m\]"
+RED="\[\e[1;31m\]"
+
+export PS1="$BLACK\h: \w$RED\$(parse_git_branch)$BLACK\$$RESET "
 
 #export PYTHONPATH=/Library/Frameworks/Python.framework/Versions/2.6/bin/python
 
