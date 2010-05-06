@@ -1,5 +1,5 @@
 export PATH=/opt/local/bin:/opt/local/sbin:/Developer/usr/bin:~/.gitscripts:$PATH
-
+export CDPATH=$HOME/src
 export MANPATH=$MANPATH
 
 export CLICOLOR=1
