@@ -1,4 +1,4 @@
-export PATH=/opt/local/bin:/opt/local/sbin:/Developer/usr/bin:~/.gitscripts:$PATH
+export PATH=/opt/local/bin:/opt/local/sbin:/Developer/usr/bin:$HOME/.gitscripts:$PATH
 export CDPATH=$HOME/src
 
 export CLICOLOR=1
