@@ -15,9 +15,9 @@ end
 
 def replace(file)
 	system "rm \"$HOME/.#{file}\""
-  link file
+	link file
 end
 
 def link(file)
-    system "ln -s \"$PWD/#{file}\" \"$HOME/.#{file}\""
+	system "ln -s \"$PWD/#{file}\" \"$HOME/.#{file}\""
 end
