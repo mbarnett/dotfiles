@@ -4,7 +4,7 @@
 " Maintainer:   Matthew Barnett <matt.barnett@gmail.com>
 " Last Change:  22 Feb 2009 
 " License:      public domain
-" Version:      1.0
+" Version:      2.0
 "
 " Modified railscasts, originally created be Josh O'Rourke <jorourke23@gmail.com> 
 "
@@ -29,38 +29,36 @@ if has("gui_running")
   hi link htmlTagName                 xmlTagName
   hi link htmlEndTag                  xmlEndTag
 
-  highlight Normal                    guifg=#E6E1DC   guibg=#2B2B2B
+  highlight Normal                    guifg=#EBE7E3   guibg=#393939
   highlight Cursor                    guifg=#000000   guibg=#FFFFFF
-  "highlight CursorLine               guibg=#323300
  
-  highlight Comment                   guifg=#1CA4DE   gui=italic
-  highlight Constant                  guifg=#6D9CBE
-  highlight Define                    guifg=#CC7833
+  highlight Comment                   guifg=#00B5E1   gui=italic
+  highlight Constant                  guifg=#FF3A83
+  highlight Define                    guifg=#FB8E2E
   highlight Error                     guifg=#FFFFFF   guibg=#990000
   highlight Function                  guifg=#FFC66D   gui=NONE
   highlight Identifier                guifg=#6D9CBE   gui=NONE
   highlight Include                   guifg=#CC7833   gui=NONE
-  highlight Keyword                   guifg=#CC7833
-  highlight LineNr                    guifg=#2B2B2B   guibg=#C0C0FF
+  highlight Keyword                   guifg=#FB8E2E
   highlight Number                    guifg=#A5C261
-  highlight PreProc                   guifg=#E6E1DC
+  highlight PreProc                   guifg=#EBE7E3 
   highlight Search                    guibg=#FFFF00
-  highlight Statement                 guifg=#CC7833   gui=NONE
-  highlight String                    guifg=#A5C261
+  highlight Statement                 guifg=#FB8E2E   gui=NONE
+  highlight String                    guifg=#55E439
   highlight Title                     guifg=#FFFFFF
-  highlight Type                      guifg=#DA4939   gui=NONE
+  highlight Type                      guifg=#E65C4D   gui=NONE
   highlight Visual                    guibg=#5A647E
 
-  highlight DiffAdd                   guifg=#E6E1DC   guibg=#144212
-  highlight DiffDelete                guifg=#E6E1DC   guibg=#660000
+  highlight DiffAdd                   guifg=#EBE7E3    guibg=#144212
+  highlight DiffDelete                guifg=#EBE7E3    guibg=#660000
   
-  highlight rubyBlockParameter        guifg=#FFFFFF
+  highlight rubyBlockParameter        guifg=#EBE7E3    guibg=#990000 
   highlight rubyClass                 guifg=#FF7D18
-  highlight rubyConstant              guifg=#DA4939
-  highlight rubyInstanceVariable      guifg=#D0D0FF
-  highlight rubyInterpolation         guifg=#519F50
-  highlight rubyLocalVariableOrMethod guifg=#D0D0FF
-  highlight rubyPredefinedConstant    guifg=#DA4939
+  highlight rubyConstant              guifg=#E65C4D
+  highlight rubyInstanceVariable      guifg=#FF3300
+  highlight rubyInterpolation         guifg=#EBE7E3    guibg=#5B5B5B
+  highlight rubyLocalVariableOrMethod guifg=#FFA500
+  highlight rubyPredefinedConstant    guifg=#E65C4D
   highlight rubyPseudoVariable        guifg=#FFC66D
   highlight rubyStringDelimiter       guifg=#A5C261
   
@@ -68,6 +66,11 @@ if has("gui_running")
   highlight xmlTagName                guifg=#E8BF6A
   highlight xmlEndTag                 guifg=#E8BF6A
 
-"  highlight StatusLine                guifg=#ce5c00 guibg=#e6e1dc
-  highlight LineNr                    guifg=#666666 guibg=#222222
+  highlight NonText		      guifg=#1930D5
+
+  highlight StatusLine		      guifg=#ebe7e3 guibg=#393939
+  highlight LineNr                    guifg=#797979 guibg=#2D2D2D
+
+  highlight Directory		      guifg=#00BBEA
+
 endif
