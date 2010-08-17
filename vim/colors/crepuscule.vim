@@ -17,6 +17,7 @@
 " [2] http://www.vim.org/scripts/script.php?script_id=1794 
 
 set background=dark
+set transparency=2
 hi clear
 if exists("syntax_on")
   syntax reset
@@ -25,14 +26,19 @@ endif
 let g:colors_name = "crepuscule"
 
 if has("gui_running")
+  highlight xmlTag                    guifg=#E8BF6A
+  highlight xmlTagName                guifg=#E8BF6A
+  highlight xmlEndTag                 guifg=#E8BF6A
+
   hi link htmlTag                     xmlTag
   hi link htmlTagName                 xmlTagName
   hi link htmlEndTag                  xmlEndTag
 
   highlight Normal                    guifg=#EBE7E3   guibg=#393939
-  highlight Cursor                    guifg=#000000   guibg=#FFFFFF
+  highlight Cursor                    guifg=#000000   guibg=#EBE7E3
  
   highlight Comment                   guifg=#00B5E1   gui=italic
+  highlight SpecialKey		      guifg=#00B5E1
   highlight Constant                  guifg=#FF3A83
   highlight Define                    guifg=#FB8E2E
   highlight Error                     guifg=#FFFFFF   guibg=#990000
@@ -46,7 +52,7 @@ if has("gui_running")
   highlight Statement                 guifg=#FB8E2E   gui=NONE
   highlight String                    guifg=#55E439
   highlight Title                     guifg=#FFFFFF
-  highlight Type                      guifg=#E65C4D   gui=NONE
+  highlight Type                      guifg=#FF3300   gui=NONE
   highlight Visual                    guibg=#5A647E
 
   highlight DiffAdd                   guifg=#EBE7E3    guibg=#144212
@@ -54,21 +60,17 @@ if has("gui_running")
   
   highlight rubyBlockParameter        guifg=#EBE7E3    guibg=#990000 
   highlight rubyClass                 guifg=#FF7D18
-  highlight rubyConstant              guifg=#E65C4D
-  highlight rubyInstanceVariable      guifg=#FF3300
+  highlight rubyConstant              guifg=#FF3300
+  highlight rubyInstanceVariable      guifg=#E65C4D
   highlight rubyInterpolation         guifg=#EBE7E3    guibg=#5B5B5B
   highlight rubyLocalVariableOrMethod guifg=#FFA500
-  highlight rubyPredefinedConstant    guifg=#E65C4D
+  highlight rubyPredefinedConstant    guifg=#FF3300
   highlight rubyPseudoVariable        guifg=#FFC66D
   highlight rubyStringDelimiter       guifg=#A5C261
   
-  highlight xmlTag                    guifg=#E8BF6A
-  highlight xmlTagName                guifg=#E8BF6A
-  highlight xmlEndTag                 guifg=#E8BF6A
-
   highlight NonText		      guifg=#1930D5
 
-  highlight StatusLine		      guifg=#ebe7e3 guibg=#393939
+  highlight StatusLine		      guifg=#EBE7E3 guibg=#393939
   highlight LineNr                    guifg=#797979 guibg=#2D2D2D
 
   highlight Directory		      guifg=#00BBEA

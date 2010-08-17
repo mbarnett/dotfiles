@@ -3,12 +3,6 @@
 " the most important thing
 set nocompatible
 
-" I need shift-movement selecting
-"behave mswin
-if has("gui_macvim")
-  let macvim_hig_shift_movement = 1
-endif
-
 " Syntax hilighting is essential
 filetype on
 syntax enable
@@ -54,20 +48,11 @@ autocmd BufNewFile,BufRead *.py setlocal smartindent cinwords=if,elif,else,for,w
 
 " omnicomplete on \\
 imap <leader><leader> <c-x><c-o>
-" regular complete on ``
-imap `` <c-x><c-u>
-
-" alt+n or alt+p to navigate between entries in QuickFix
-map <silent> <m-p> :cp <cr>
-map <silent> <m-n> :cn <cr>
-
-" Fuzzy file completion ala textmate on \t
-"map <leader>t :FuzzyFinderTextMate<CR>
- 
+" regular, textmate style complete on ``
+imap `` <c-x><c-u> 
 
 
 " ok, basic command mapping and setup is out of the way, settings time
-set cf  " Enable error files & error jumping.
 set clipboard+=unnamed  " Yanks go on clipboard instead.
 set history=256  " Number of things to remember in history.
 set autowrite  " Writes on make/shell commands
@@ -75,28 +60,23 @@ set ruler  " Ruler on
 set nu  " Line numbers on
 set nowrap  " Line wrapping off
 set timeoutlen=250  " Time to wait after ESC (default causes an annoying delay)
-set foldmethod=marker " fold on {{{ }}}
-
-" Formatting (some of these are for coding in C and C++)
 set bs=2  " Backspace over everything in insert mode
-set nocp incsearch
+set incsearch
 set autoindent
- 
-" Visual
 set showmatch  " Show matching brackets.
 set mat=5  " Bracket blinking.
 set visualbell  " error blinking .
 set noerrorbells  " No noise.
 set laststatus=2  " Always show status line.
- 
-" gvim specific
 set mousehide  " Hide mouse after chars typed
 set mouse=a  " Mouse in all modes
+set whichwrap=<,>,h,l,[,] " moving off the start or end of a line goes to the previous next
 
 " Backups & Files
 set backup                     " Enable creation of backup file.
 set backupdir=~/.vim/backups " Where backups will go.
 set directory=~/.vim/tmp     " Where temporary files will go.
 
-" Needs to be down here for reasons I am unclear on
-set whichwrap=<,>,h,l,[,] " moving off the start or end of a line goes to the previous next
+"autocmd VimEnter * NERDTree " Start NERDTree Automatically
+"autocmd VimEnter * wincmd p " Then move cursor back to the main window
+
