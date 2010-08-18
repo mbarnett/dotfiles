@@ -22,7 +22,7 @@ export PS1="$BLACK\h: \w$RED\$(parse_git_branch)$BLACK\$$RESET "
 #export JAVA_HOME=/System/Library/Frameworks/JavaVM.framework/Versions/1.5/Home/
 
 alias ls='ls -hG'
-alias vim='/Applications/MacVim-7.2/mvim'
+alias vim='/Applications/MacVim/mvim'
 
 #from http://theapotek.com/teknotes/2006/12/01/making-the-mac-os-x-bash-shell-alias-and-symlink-agnostic/
 # teach shell to treat aliases like symbolic links rather than files
