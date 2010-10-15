@@ -3,6 +3,11 @@
 " the most important thing
 set nocompatible
 
+if has("gui_macvim")
+  let macvim_hig_shift_movement = 1
+endif
+
+
 " Syntax hilighting is essential
 filetype on
 syntax enable
@@ -26,11 +31,8 @@ let g:miniBufExplModSelTarget = 1
 autocmd User Rails set noexpandtab
 " Ruby formatting
 autocmd FileType ruby,eruby setlocal ts=2 sts=2 sw=2 noexpandtab
-" Ruby autocompletion
-autocmd FileType ruby,eruby set omnifunc=rubycomplete#Complete
-autocmd FileType ruby,eruby let g:rubycomplete_buffer_loading = 1
-autocmd FileType ruby,eruby let g:rubycomplete_rails = 1
-autocmd FileType ruby,eruby let g:rubycomplete_classes_in_global = 1
+" Hash rocket in ruby mode is control-l, like in textmate
+autocmd FileType ruby,eruby imap <c-l> <space>=><space>
 " Change which file opens after executing :Rails command
 let g:rails_default_file='config/database.yml'
 
@@ -45,9 +47,6 @@ autocmd FileType javascript setlocal ts=4 sts=4 sw=4 noexpandtab
 autocmd BufNewFile,BufRead *.py setlocal smartindent cinwords=if,elif,else,for,while,try,except,finally,def,class
 
 " autocompletion mapping
-
-" omnicomplete on \\
-imap <leader><leader> <c-x><c-o>
 " regular, textmate style complete on ``
 imap `` <c-x><c-u> 
 
@@ -62,7 +61,10 @@ set nowrap  " Line wrapping off
 set timeoutlen=250  " Time to wait after ESC (default causes an annoying delay)
 set bs=2  " Backspace over everything in insert mode
 set incsearch
+" auto indenting
 set autoindent
+" load indent files, to automatically do language-dependent indenting.
+filetype plugin indent on
 set showmatch  " Show matching brackets.
 set mat=5  " Bracket blinking.
 set visualbell  " error blinking .
@@ -77,6 +79,21 @@ set backup                     " Enable creation of backup file.
 set backupdir=~/.vim/backups " Where backups will go.
 set directory=~/.vim/tmp     " Where temporary files will go.
 
-"autocmd VimEnter * NERDTree " Start NERDTree Automatically
-"autocmd VimEnter * wincmd p " Then move cursor back to the main window
+" Mappings
+nmap <leader>] :Bclose<cr>
+nmap <D-F> :Ack<space>
+" open NERDTree and shift to it
+nmap <D-T> :NERDTreeToggle<cr><c-l>
 
+" when we enter quickfix, \w means close quickfix, when we leave it, it means close buffer
+" don't close |nofile| buffers like nerdtree or minibufexpl
+autocmd WinEnter * call RemapCloseForQuickfix()
+function RemapCloseForQuickfix()
+	 if (getbufvar(winbufnr(winnr()), "&buftype") == "quickfix")
+		nmap <leader>] :ccl<cr>
+	 elseif (getbufvar(winbufnr(winnr()), "&buftype") == "nofile")
+		 nmap <leader>] <Nop>
+	 else
+		nmap <leader>] :Bclose<CR>
+	 endif
+endfunction
