@@ -26,6 +26,7 @@ endif
 let g:colors_name = "crepuscule"
 
 if has("gui_running")
+  set guifont=Menlo:h12
   highlight xmlTag                    guifg=#E8BF6A
   highlight xmlTagName                guifg=#E8BF6A
   highlight xmlEndTag                 guifg=#E8BF6A

@@ -7,6 +7,9 @@ if has("gui_macvim")
   let macvim_hig_shift_movement = 1
 endif
 
+" load pathogen
+call pathogen#runtime_append_all_bundles()
+call pathogen#helptags()
 
 " Syntax hilighting is essential
 filetype on
@@ -25,6 +28,9 @@ let g:miniBufExplMapWindowNavArrows = 1
 let g:miniBufExplMapCTabSwitchBufs = 1
 let g:miniBufExplModSelTarget = 1
 
+" let supertab and endwise co-exist peacefully
+let g:SuperTabCrMapping = 0
+
 " Ruby Settings
 
 " Keep rails.vim the hell out of my tab settings
@@ -42,13 +48,8 @@ autocmd FileType make setlocal ts=8 sts=8 sw=8 noexpandtab
 autocmd FileType yaml setlocal ts=2 sts=2 sw=2 expandtab
 autocmd FileType javascript setlocal ts=4 sts=4 sw=4 noexpandtab
 
-
 " Python auto indenting
 autocmd BufNewFile,BufRead *.py setlocal smartindent cinwords=if,elif,else,for,while,try,except,finally,def,class
-
-" autocompletion mapping
-" regular, textmate style complete on ``
-imap `` <c-x><c-u> 
 
 
 " ok, basic command mapping and setup is out of the way, settings time
@@ -80,20 +81,27 @@ set backupdir=~/.vim/backups " Where backups will go.
 set directory=~/.vim/tmp     " Where temporary files will go.
 
 " Mappings
-nmap <leader>] :Bclose<cr>
-nmap <D-F> :Ack<space>
+map <D-F> :Ack<space>
 " open NERDTree and shift to it
-nmap <D-T> :NERDTreeToggle<cr><c-l>
+map <D-P> :NERDTreeToggle<cr><c-l>
+vmap <D-/> :TComment<cr>
+map <D-t> <Plug>PeepOpen
 
-" when we enter quickfix, \w means close quickfix, when we leave it, it means close buffer
+" when we enter quickfix, cmd-w means close quickfix, when we leave it, it means close buffer
 " don't close |nofile| buffers like nerdtree or minibufexpl
+map <D-w> :Bclose<cr>
 autocmd WinEnter * call RemapCloseForQuickfix()
+autocmd BufWinEnter quickfix nmap <D-w> :ccl<cr>
 function RemapCloseForQuickfix()
 	 if (getbufvar(winbufnr(winnr()), "&buftype") == "quickfix")
-		nmap <leader>] :ccl<cr>
+		nmap <D-w> :ccl<cr>
 	 elseif (getbufvar(winbufnr(winnr()), "&buftype") == "nofile")
-		 nmap <leader>] <Nop>
+		 nmap <D-w> <Nop>
 	 else
-		nmap <leader>] :Bclose<CR>
+		nmap <D-w> :Bclose<CR>
 	 endif
 endfunction
+
+autocmd VimEnter * NERDTree " Start NERDTree Automatically
+autocmd VimEnter * wincmd p " Then move cursor back to the main window
+
