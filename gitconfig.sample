@@ -1,0 +1,15 @@
+[user]
+	name = Matt Barnett
+	email = matt@wtmworldwide.com
+[core]
+	editor = vim
+[github]
+	user = 
+	token = 
+[alias]
+	undo-all = reset --hard
+	unstage = reset HEAD
+	track = branch --track
+	incoming = !git-incoming.sh
+	outgoing = !git-outgoing.sh
+	stat = status
