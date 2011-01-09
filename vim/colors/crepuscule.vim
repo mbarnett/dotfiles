@@ -39,7 +39,6 @@ if has("gui_running")
   highlight Cursor                    guifg=#000000   guibg=#EBE7E3
  
   highlight Comment                   guifg=#00B5E1   gui=italic
-  highlight SpecialKey		      guifg=#66767A
   highlight Constant                  guifg=#FF3A83
   highlight Define                    guifg=#FB8E2E
   highlight Error                     guifg=#FFFFFF   guibg=#990000
@@ -69,7 +68,8 @@ if has("gui_running")
   highlight rubyPseudoVariable        guifg=#FFC66D
   highlight rubyStringDelimiter       guifg=#A5C261
   
-  highlight NonText		      guifg=#66767A
+  highlight NonText		      guifg=#5A5A5A
+  highlight SpecialKey		      guifg=#5A5A5A
 
   highlight StatusLine		      guifg=#EBE7E3 guibg=#393939
   highlight LineNr                    guifg=#797979 guibg=#2D2D2D
