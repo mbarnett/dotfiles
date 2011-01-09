@@ -75,6 +75,11 @@ set mousehide  " Hide mouse after chars typed
 set mouse=a  " Mouse in all modes
 set whichwrap=<,>,h,l,[,] " moving off the start or end of a line goes to the previous next
 
+" Better invisibles
+set list
+set listchars=tab:▸\ ,eol:¬
+" 
+
 " Backups & Files
 set backup                     " Enable creation of backup file.
 set backupdir=~/.vim/backups " Where backups will go.
