@@ -4,7 +4,7 @@ task :default => [:install]
 
 task :install do
   Dir['*'].each do |file|
-    next if file == 'Rakefile'  
+    next if (file == 'Rakefile')  || ((file =~ /\.sample$/) != nil)
     if File.exist?(File.join(ENV['HOME'], ".#{file}"))
       replace file
     else
