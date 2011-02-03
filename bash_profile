@@ -1,10 +1,16 @@
-export PATH=/opt/local/bin:/opt/local/sbin:/Developer/usr/bin:$HOME/.gitscripts:$PATH
+export PATH=$PATH:/Developer/usr/bin:/usr/local/sbin:/opt/local/bin:/opt/local/sbin:$HOME/.gitscripts
 export CDPATH=$HOME/src
 
 export CLICOLOR=1
 export LSCOLORS=ExFxCxDxBxegedabagacad
 
 export EDITOR="mate -w"
+
+# for Go
+export GOROOT=`brew --cellar`/go/HEAD
+export GOBIN=/usr/local/bin
+export GOARCH=amd64
+export GOOS=darwin
 
 function parse_git_branch {
   ref=$(git symbolic-ref HEAD 2> /dev/null) || return
@@ -23,6 +29,8 @@ export PS1="$BLACK\h: \w$RED\$(parse_git_branch)$BLACK\$$RESET "
 
 alias ls='ls -hG'
 alias vim='/Applications/MacVim/mvim'
+alias emacs='/Applications/Emacs.app/Contents/MacOS/Emacs -nw'
+
 
 #from http://theapotek.com/teknotes/2006/12/01/making-the-mac-os-x-bash-shell-alias-and-symlink-agnostic/
 # teach shell to treat aliases like symbolic links rather than files
