@@ -1,4 +1,4 @@
-export PATH=$PATH:/Developer/usr/bin:/usr/local/sbin:/opt/local/bin:/opt/local/sbin:$HOME/.gitscripts
+export PATH=$PATH:/Developer/usr/bin:/usr/local/sbin:/opt/local/bin:/opt/local/sbin:/usr/local/share/npm/bin:$HOME/.gitscripts
 export CDPATH=$HOME/src
 
 export CLICOLOR=1
@@ -11,6 +11,7 @@ export GOROOT=`brew --cellar`/go/HEAD
 export GOBIN=/usr/local/bin
 export GOARCH=amd64
 export GOOS=darwin
+export NODE_PATH=/usr/local/lib/node
 
 function parse_git_branch {
   ref=$(git symbolic-ref HEAD 2> /dev/null) || return
