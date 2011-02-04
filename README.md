@@ -1,4 +1,4 @@
-My Major Config Files
-=====================
+My config files
+----------------
 
 Saved to GitHub for easy backup. "rake install" to install.
