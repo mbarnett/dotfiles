@@ -13,6 +13,7 @@
 (add-to-list 'load-path pkg-dir)
 (add-to-list 'load-path (concat pkg-dir "/w3m"))
 
+
 ;; My utilities
 
 (require 'utility)
@@ -87,6 +88,7 @@
 (column-number-mode t)              ; Show column number in modeline
 (set-fringe-style 'half)            ; Half-sized gutters on the edges
 (set-backup-dir backup-dir)         ; Keep the filesystem tidy
+(transient-mark-mode 1)             ; I prefer transient mark mode
 
 
 ;; Font and Appearance
@@ -101,6 +103,7 @@
 
 (add-to-list 'default-frame-alist '(height . 49))
 (add-to-list 'default-frame-alist '(width . 160))
+
 
 (defun rcy-browse-url-default-macosx-browser (url &optional new-window)
   (interactive (browse-url-interactive-arg "URL: "))
@@ -136,22 +139,20 @@
             ))
 
 
-;; Serenity stuff
-
 ;; Serenity emacs key rebindings
 
-(global-set-key (kbd "C-w") 'backward-kill-word)
-(global-set-key (kbd "C-q") 'kill-region)
-(global-set-key (kbd "M-q") 'kill-ring-save)
+(defun back-kill-or-kill-region (arg)
+  "Kill the region if active, else backwards kill a word"
+  (interactive "p")
+  (if (and transient-mark-mode mark-active)
+      (kill-region (region-beginning) (region-end))
+    (backward-kill-word arg)))
 
-
+(global-set-key (kbd "C-w") 'back-kill-or-kill-region)
 (global-set-key (kbd "M-/") 'comment-region)
-
-
-
 (global-set-key (kbd "C-x C-b") 'switch-to-buffer)
-
 (global-set-key (kbd "C-]") 'indent-region)
+
 
 ;; Behave like vi's o command
 (defun open-next-line (arg)
@@ -177,5 +178,31 @@
 (global-set-key (kbd "M-o") 'open-previous-line)
 
 ;; Autoindent open-*-lines
+
 (defvar newline-and-indent t
   "Modify the behavior of the open-*-line functions to cause them to autoindent.")
+
+ (setq tabbar-buffer-groups-function
+           (lambda ()
+             (list "All Buffers")))
+ (setq tabbar-buffer-list-function
+     	(lambda ()
+     	  (remove-if
+     	   (lambda(buffer)
+     	     (find (aref (buffer-name buffer) 0) " *"))
+     	   (buffer-list))))
+(require 'tabbar)
+
+
+(setq EmacsPortable-global-tabbar 't) ; If you want tabbar
+(require 'tabbar-ruler)
+
+;;settings for hippie-expand
+(setq hippie-expand-try-functions-list
+       '(try-expand-dabbrev
+         try-expand-dabbrev-from-kill
+         try-expand-dabbrev-all-buffers
+         try-expand-line
+         try-complete-file-name-partially
+         try-complete-file-name))
+(setq smart-tab-using-hippie-expand t)
