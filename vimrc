@@ -107,6 +107,6 @@ function RemapCloseForQuickfix()
 	 endif
 endfunction
 
-autocmd VimEnter * NERDTree " Start NERDTree Automatically
-autocmd VimEnter * wincmd p " Then move cursor back to the main window
+"autocmd VimEnter * NERDTree " Start NERDTree Automatically
+"autocmd VimEnter * wincmd p " Then move cursor back to the main window
 

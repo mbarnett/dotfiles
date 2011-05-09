@@ -1,4 +1,4 @@
-export PATH=$PATH:/Developer/usr/bin:/usr/local/sbin:/opt/local/bin:/opt/local/sbin:/usr/local/share/npm/bin:$HOME/.gitscripts
+export PATH=/usr/local/bin:$PATH:/Developer/usr/bin:/usr/local/sbin:/opt/local/bin:/opt/local/sbin:/usr/local/share/npm/bin:$HOME/.gitscripts:$HOME/.cabal/bin
 export CDPATH=$HOME/src
 
 export CLICOLOR=1
@@ -26,7 +26,7 @@ export PS1="$BLACK\h: \w$RED\$(parse_git_branch)$BLACK\$$RESET "
 
 #export PYTHONPATH=/Library/Frameworks/Python.framework/Versions/2.6/bin/python
 
-#export JAVA_HOME=/System/Library/Frameworks/JavaVM.framework/Versions/1.5/Home/
+#export JAVA_HOME=/usr/lib_exec/java_home/
 
 alias ls='ls -hG'
 alias vim='/Applications/MacVim/mvim'

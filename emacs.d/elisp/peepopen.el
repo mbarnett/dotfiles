@@ -80,14 +80,14 @@
 
 (defun peepopen-bind-aquamacs-keys ()
   ;; Need `osx-key-mode-map' to override
-  (define-key osx-key-mode-map (kbd "A-t") 'peepopen-goto-file-gui)
-  (define-key *textmate-mode-map* (kbd "A-t") 'peepopen-goto-file-gui))
+  (define-key osx-key-mode-map (kbd "C-t") 'peepopen-goto-file-gui)
+  (define-key *textmate-mode-map* (kbd "C-t") 'peepopen-goto-file-gui))
 
 (defun peepopen-bind-carbon-keys ()
   (define-key *textmate-mode-map* [(meta t)] 'peepopen-goto-file-gui))
 
 (defun peepopen-bind-ns-keys ()
-  (define-key *textmate-mode-map* [(super t)] 'peepopen-goto-file-gui))
+  (define-key *textmate-mode-map* (kbd "C-t") 'peepopen-goto-file-gui))
 
 ;;;###autoload
 (add-hook 'textmate-mode-hook 'peepopen-bind-keys)
