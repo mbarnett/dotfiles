@@ -24,6 +24,17 @@
 (global-smart-tab-mode 1)
 
 
+;; eproject
+
+(require 'eproject)
+
+
+;; peepopen
+
+(require 'eproject-peepopen)
+(setq ns-pop-up-frames nil)
+
+
 ;; SLIME config
 
 (setq slime-lisp-implementations
@@ -46,11 +57,6 @@
 ;; Browse url at point with C-x m
 
 (global-set-key "\C-xm" 'browse-url-at-point)
-
-
-;; Vimpulse
-
-;(require 'vimpulse)
 
 
 ;; Niceties
@@ -106,17 +112,14 @@
  
 (setq browse-url-browser-function 'rcy-browse-url-default-macosx-browser)
 
-    (setq mac-option-key-is-meta nil)
-   (setq mac-command-key-is-meta t)
-    (setq mac-command-modifier 'meta)
-    (setq mac-option-modifier nil)
-(require 'unbound)
+(setq mac-option-key-is-meta nil)
+(setq mac-command-key-is-meta t)
+(setq mac-command-modifier 'meta)
+(setq mac-option-modifier nil)
 
-
-
-    (setq-default c-basic-offset 4
-                  tab-width 4
-                  indent-tabs-mode nil)
+(setq-default c-basic-offset 4
+              tab-width 4
+              indent-tabs-mode nil)
 
 
 (autoload 'ruby-mode "ruby-mode" "Ruby editing mode." t)
@@ -137,10 +140,9 @@
 
 ;; Serenity emacs key rebindings
 
-(global-set-key "\C-w" 'backward-kill-word)
+(global-set-key (kbd "C-w") 'backward-kill-word)
 (global-set-key (kbd "C-q") 'kill-region)
 (global-set-key (kbd "M-q") 'kill-ring-save)
-
 
 
 (global-set-key (kbd "M-/") 'comment-region)
@@ -177,9 +179,3 @@
 ;; Autoindent open-*-lines
 (defvar newline-and-indent t
   "Modify the behavior of the open-*-line functions to cause them to autoindent.")
-
-   (add-to-list 'load-path "~/.emacs.d/elisp/textmate.el")
-   (require 'textmate)
-   (require 'peepopen)
-   (textmate-mode)
-(setq ns-pop-up-frames nil)
