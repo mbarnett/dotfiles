@@ -1,15 +1,28 @@
+[color]
+  branch = auto
+  diff = auto
+  status = auto
 [user]
-	name = Matt Barnett
-	email = matt@wtmworldwide.com
+  name = Matt Barnett
+  email = matt@wtmworldwide.com
 [core]
-	editor = vim
+  editor = emacs
+  excludesfile = /Users/matt/.gitignore
 [github]
-	user = 
-	token = 
+  user = 
+  token = 
 [alias]
-	undo-all = reset --hard
-	unstage = reset HEAD
-	track = branch --track
-	incoming = !git-incoming.sh
-	outgoing = !git-outgoing.sh
-	stat = status
+  undo-all = reset --hard
+  unstage = reset HEAD
+  track = branch --track
+  incoming = !git-incoming.sh
+  outgoing = !git-outgoing.sh
+  stat = status
+[merge]
+  keepBackup = false;
+  tool = p4merge
+[mergetool "p4merge"]
+  cmd = p4merge "$BASE" "$LOCAL" "$REMOTE" "$MERGED"
+  keepTemporaries = false
+  trustExitCode = false
+  keepBackup = false
