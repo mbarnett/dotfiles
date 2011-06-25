@@ -19,47 +19,6 @@
 (require 'utility)
 
 
-;; Smart Tab dynamic completions
-
-(require 'smart-tab)
-(global-smart-tab-mode 1)
-
-
-;; eproject
-
-(require 'eproject)
-
-
-;; peepopen
-
-(require 'eproject-peepopen)
-(setq ns-pop-up-frames nil)
-
-
-;; SLIME config
-
-(setq slime-lisp-implementations
-      '((ccl ("/usr/local/bin/ccl"))
-        (sbcl ("/usr/local/bin/sbcl"))
-        (clisp ("/usr/local/bin/clisp"))))
-
-(load (expand-file-name "~/.quicklisp/slime-helper.el"))
-
-
-;; w3m Config
-
-(require 'w3m-load)
-
-(setq w3m-command "/usr/local/bin/w3m")
-(setq browse-url-browser-function 'w3m-browse-url)
-(autoload 'w3m-browse-url "w3m" "Ask a WWW browser to show a URL." t)
-
-
-;; Browse url at point with C-x m
-
-(global-set-key "\C-xm" 'browse-url-at-point)
-
-
 ;; Niceties
 
 (setq backup-by-copying t)          ; Don't clobber symlinks
@@ -77,6 +36,17 @@
 
 (setq-default tab-width 4)          ; Default tabs to 4 spaces
 (setq-default indent-tabs-mode nil) ; Don't turn leading spaces into tabs
+(setq newline-and-indent t)         ; Autoindent open-*-lines
+
+;; Settings for hippie-expand
+(setq hippie-expand-try-functions-list
+      '(try-expand-dabbrev
+        try-expand-dabbrev-from-kill
+        try-expand-dabbrev-all-buffers
+        try-expand-line
+        try-complete-file-name-partially
+        try-complete-file-name))
+(setq smart-tab-using-hippie-expand t)
 
 (fset 'yes-or-no-p 'y-or-n-p)       ; Those long-form questions are annoying
 
@@ -103,16 +73,10 @@
 
 (add-to-list 'default-frame-alist '(height . 49))
 (add-to-list 'default-frame-alist '(width . 160))
-
-
-(defun rcy-browse-url-default-macosx-browser (url &optional new-window)
-  (interactive (browse-url-interactive-arg "URL: "))
-  (let ((url
-	 (if (aref (url-generic-parse-url url) 0)
-	     url
-	   (concat "http://" url))))
-    (start-process (concat "open " url) nil "open" url)))
  
+
+;; Mac specific stuff
+
 (setq browse-url-browser-function 'rcy-browse-url-default-macosx-browser)
 
 (setq mac-option-key-is-meta nil)
@@ -120,10 +84,26 @@
 (setq mac-command-modifier 'meta)
 (setq mac-option-modifier nil)
 
+
+;; Key rebindings
+
+(global-set-key (kbd "C-w") 'back-kill-or-kill-region)
+(global-set-key (kbd "M-/") 'comment-region)
+(global-set-key (kbd "C-x C-b") 'switch-to-buffer)
+(global-set-key (kbd "C-o") 'open-next-line)
+(global-set-key (kbd "M-o") 'open-previous-line)
+
+
+;; Basic code settings
+
 (setq-default c-basic-offset 4
               tab-width 4
               indent-tabs-mode nil)
 
+
+;; Ruby mode settings
+
+(require 'yaml-mode)
 
 (autoload 'ruby-mode "ruby-mode" "Ruby editing mode." t)
 (setq auto-mode-alist  (cons '("\\.rb$" . ruby-mode) auto-mode-alist))
@@ -132,77 +112,91 @@
 (modify-coding-system-alist 'file "\\.rb$" 'utf-8)
 (modify-coding-system-alist 'file "\\.rhtml$" 'utf-8)
 
+(add-to-list 'auto-mode-alist '("\\.yml$" . yaml-mode))
+
 (add-hook 'ruby-mode-hook
           (lambda ()
             (set (make-local-variable 'indent-tabs-mode) 't)
             (set (make-local-variable 'tab-width) 2)
+            (global-set-key (kbd "C-l") 'insert-hashrocket)
+            (local-set-key (kbd "RET") 'reindent-then-newline-and-indent)
             ))
 
 
-;; Serenity emacs key rebindings
+;; Tabbar
 
-(defun back-kill-or-kill-region (arg)
-  "Kill the region if active, else backwards kill a word"
-  (interactive "p")
-  (if (and transient-mark-mode mark-active)
-      (kill-region (region-beginning) (region-end))
-    (backward-kill-word arg)))
-
-(global-set-key (kbd "C-w") 'back-kill-or-kill-region)
-(global-set-key (kbd "M-/") 'comment-region)
-(global-set-key (kbd "C-x C-b") 'switch-to-buffer)
-(global-set-key (kbd "C-]") 'indent-region)
-
-
-;; Behave like vi's o command
-(defun open-next-line (arg)
-  "Move to the next line and then opens a line.
-    See also `newline-and-indent'."
-  (interactive "p")
-  (end-of-line)
-  (open-line arg)
-  (next-line 1)
-  (when newline-and-indent
-    (indent-according-to-mode)))
-(global-set-key (kbd "C-o") 'open-next-line)
-
-;; Behave like vi's O command
-(defun open-previous-line (arg)
-  "Open a new line before the current one. 
-     See also `newline-and-indent'."
-  (interactive "p")
-  (beginning-of-line)
-  (open-line arg)
-  (when newline-and-indent
-    (indent-according-to-mode)))
-(global-set-key (kbd "M-o") 'open-previous-line)
-
-;; Autoindent open-*-lines
-
-(defvar newline-and-indent t
-  "Modify the behavior of the open-*-line functions to cause them to autoindent.")
-
- (setq tabbar-buffer-groups-function
-           (lambda ()
-             (list "All Buffers")))
- (setq tabbar-buffer-list-function
-     	(lambda ()
-     	  (remove-if
-     	   (lambda(buffer)
-     	     (find (aref (buffer-name buffer) 0) " *"))
-     	   (buffer-list))))
 (require 'tabbar)
+(require 'tabbar-ruler)
+
+(setq tabbar-buffer-groups-function
+      (lambda ()
+        (list "All Buffers")))
+
+(setq tabbar-buffer-list-function
+      (lambda ()
+        (remove-if
+         (lambda(buffer)
+           (find (aref (buffer-name buffer) 0) " *"))
+         (buffer-list))))
 
 
 (setq EmacsPortable-global-tabbar 't) ; If you want tabbar
-(require 'tabbar-ruler)
 
-;;settings for hippie-expand
-(setq hippie-expand-try-functions-list
-       '(try-expand-dabbrev
-         try-expand-dabbrev-from-kill
-         try-expand-dabbrev-all-buffers
-         try-expand-line
-         try-complete-file-name-partially
-         try-complete-file-name))
-(setq smart-tab-using-hippie-expand t)
+
+;; Speedbar
+
+(require 'speedbar)
+(require 'sr-speedbar)
+
+(setq speedbar-use-images nil)
+(setq sr-speedbar-right-side nil)
+(speedbar-add-supported-extension ".rb")
+(speedbar-add-supported-extension ".yml")
+(setq sr-speedbar-auto-refresh nil)
+(global-set-key [f1] 'sr-speedbar-toggle)
+
+
+;; Smart Tab dynamic completions
+
+(require 'smart-tab)
+(global-smart-tab-mode 1)
+
+
+;; eproject
+
+(require 'eproject)
+
+(defun eproject-grep (regexp)
+  "Search all files in the current project for REGEXP."
+  (interactive "sRegexp grep: ")
+  (let* ((root (eproject-root))
+         (default-directory root)
+         (files (eproject-list-project-files-relative root)))
+    (grep-compute-defaults)
+    (lgrep regexp (combine-and-quote-strings files) root)))
+
+
+;; peepopen
+
+(require 'eproject-peepopen)
+(setq ns-pop-up-frames nil)
+
+
+;; SLIME config
+
+(setq slime-lisp-implementations
+      '((ccl ("/usr/local/bin/ccl"))
+        (sbcl ("/usr/local/bin/sbcl"))
+        (clisp ("/usr/local/bin/clisp"))))
+
+(load (expand-file-name "~/.quicklisp/slime-helper.el"))
+
+
+;; w3m Config
+
+(require 'w3m-load)
+
+(setq w3m-command "/usr/local/bin/w3m")
+(setq browse-url-browser-function 'w3m-browse-url)
+(autoload 'w3m-browse-url "w3m" "Ask a WWW browser to show a URL." t)
+(global-set-key "\C-xm" 'browse-url-at-point) ; Browse url at point with C-x m
