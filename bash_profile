@@ -4,7 +4,7 @@ export CDPATH=$HOME/src
 export CLICOLOR=1
 export LSCOLORS=ExFxCxDxBxegedabagacad
 
-export EDITOR="mate -w"
+export EDITOR="emacs -nw"
 
 # for Go
 export GOROOT=`brew --cellar`/go/HEAD
