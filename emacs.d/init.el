@@ -113,6 +113,7 @@
 (modify-coding-system-alist 'file "\\.rhtml$" 'utf-8)
 
 (add-to-list 'auto-mode-alist '("\\.yml$" . yaml-mode))
+(add-to-list 'auto-mode-alist '("\\.rake$" . ruby-mode))
 
 (add-hook 'ruby-mode-hook
           (lambda ()
