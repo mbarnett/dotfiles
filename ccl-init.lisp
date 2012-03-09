@@ -5,3 +5,5 @@
   (when (probe-file quicklisp-init)
     (load quicklisp-init)))
 
+
+(push #p"Source/hula-girl/" asdf:*central-registry*)

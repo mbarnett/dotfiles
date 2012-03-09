@@ -1,3 +1,6 @@
+(set-language-environment "utf-8")
+
+
 ;; Constants
 
 (setq config-dir (expand-file-name "~/.emacs.d/"))
@@ -59,6 +62,7 @@
 (set-fringe-style 'half)            ; Half-sized gutters on the edges
 (set-backup-dir backup-dir)         ; Keep the filesystem tidy
 (transient-mark-mode 1)             ; I prefer transient mark mode
+(blink-cursor-mode -1)
 
 
 ;; Font and Appearance
@@ -77,13 +81,16 @@
 
 ;; Mac specific stuff
 
-(setq browse-url-browser-function 'rcy-browse-url-default-macosx-browser)
+(if (is-mac)
+    (progn
+      (ns-set-resource nil "ApplePressAndHoldEnabled" "NO")
+      (setq ns-pop-up-frames nil)
+      (setq browse-url-browser-function 'rcy-browse-url-default-macosx-browser)
 
-(setq mac-option-key-is-meta nil)
-(setq mac-command-key-is-meta t)
-(setq mac-command-modifier 'meta)
-(setq mac-option-modifier nil)
-
+      (setq mac-option-key-is-meta nil)
+      (setq mac-command-key-is-meta t)
+      (setq mac-command-modifier 'meta)
+      (setq mac-option-modifier nil)))
 
 ;; Key rebindings
 
@@ -92,7 +99,9 @@
 (global-set-key (kbd "C-x C-b") 'switch-to-buffer)
 (global-set-key (kbd "C-o") 'open-next-line)
 (global-set-key (kbd "M-o") 'open-previous-line)
-
+(global-set-key (kbd "C-a") 'move-start-of-line-or-prev-line)
+(global-set-key (kbd "C-e") 'move-end-of-line-or-next-line)
+(global-set-key (kbd "C-;") 'smart-slime-repl-switch)
 
 ;; Basic code settings
 
@@ -115,13 +124,26 @@
 (add-to-list 'auto-mode-alist '("\\.yml$" . yaml-mode))
 (add-to-list 'auto-mode-alist '("\\.rake$" . ruby-mode))
 
+(setq ruby-deep-indent-paren nil)
+
 (add-hook 'ruby-mode-hook
           (lambda ()
             (set (make-local-variable 'indent-tabs-mode) 't)
             (set (make-local-variable 'tab-width) 2)
             (global-set-key (kbd "C-l") 'insert-hashrocket)
-            (local-set-key (kbd "RET") 'reindent-then-newline-and-indent)
-            ))
+            (local-set-key (kbd "RET") 'reindent-then-newline-and-indent)))
+
+
+;; Lisp stuff
+
+(setq lisp-simple-loop-indentation 2
+      lisp-loop-keyword-indentation 6
+      lisp-loop-forms-indentation 9)
+
+
+;; ObjC
+
+(setq auto-mode-alist (cons '("\\.mm$" . objc-mode) auto-mode-alist))
 
 
 ;; Tabbar
@@ -141,7 +163,7 @@
          (buffer-list))))
 
 
-(setq EmacsPortable-global-tabbar 't) ; If you want tabbar
+(setq EmacsPortable-global-tabbar 't)
 
 
 ;; Speedbar
@@ -153,6 +175,8 @@
 (setq sr-speedbar-right-side nil)
 (speedbar-add-supported-extension ".rb")
 (speedbar-add-supported-extension ".yml")
+(speedbar-add-supported-extension ".lisp")
+(speedbar-add-supported-extension ".asd")
 (setq sr-speedbar-auto-refresh nil)
 (global-set-key [f1] 'sr-speedbar-toggle)
 
@@ -180,17 +204,20 @@
 ;; peepopen
 
 (require 'eproject-peepopen)
-(setq ns-pop-up-frames nil)
 
 
 ;; SLIME config
 
 (setq slime-lisp-implementations
-      '((ccl ("/usr/local/bin/ccl"))
+      '((ccl ("/usr/local/bin/ccl64"))
+        (ccl32 ("/usr/local/bin/ccl"))
         (sbcl ("/usr/local/bin/sbcl"))
-        (clisp ("/usr/local/bin/clisp"))))
+        (clisp ("/usr/local/bin/clisp"))
+        (cmucl ("/usr/local/bin/lisp"))))
 
 (load (expand-file-name "~/.quicklisp/slime-helper.el"))
+(setq slime-net-coding-system 'utf-8-unix) ; utf-8 support for clozure 
+(slime-setup '(slime-fancy slime-banner))
 
 
 ;; w3m Config
@@ -201,3 +228,32 @@
 (setq browse-url-browser-function 'w3m-browse-url)
 (autoload 'w3m-browse-url "w3m" "Ask a WWW browser to show a URL." t)
 (global-set-key "\C-xm" 'browse-url-at-point) ; Browse url at point with C-x m
+
+
+;; Nyan mode
+
+(require 'nyan-mode)
+(nyan-mode 1)
+
+
+;; Multi-term mode
+(require 'multi-term)
+(setq multi-term-program "/usr/local/bin/fish")
+(add-to-list 'smart-tab-disabled-major-modes 'term-mode)
+
+
+;; Custom-set-variables stuff
+
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(custom-safe-themes (quote ("80d0ca69001b0896fe496f20ed9223ee25b9e416" default))))
+
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ )

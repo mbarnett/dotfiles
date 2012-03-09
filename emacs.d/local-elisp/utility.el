@@ -1,8 +1,15 @@
 ;;; My local utility functions
 
-(setq fallback-font "Courier-12")
+;; Platform tests
+
+(defun is-mac ()
+  (and 
+   (eq system-type 'darwin)
+   (not (eq window-system nil))))
 
 ;; Portably specify default fonts like Apple Menlo
+
+(setq fallback-font "Courier-12")
 
 (defun set-font-if-exists (font)
   (if (not (eq window-system nil))
@@ -77,5 +84,41 @@
   "Inserts a hashrocket"
   (interactive)
   (insert " => "))
+
+(defun move-end-of-line-or-next-line ()
+  (interactive)
+  (if (eolp)
+      (next-line)
+      (move-end-of-line nil)))
+
+(defun move-start-of-line-or-prev-line ()
+  (interactive)
+  (if (bolp)
+      (previous-line)
+      (move-beginning-of-line nil)))
+
+
+;; hunt down the name of the Slime REPL buffer, if it exists
+
+(defun find-slime-repl-buffer-name ()
+  (let ((buffers (mapcar (function buffer-name) (buffer-list)))
+        (candidate nil))
+    (while buffers
+      (setq candidate (car buffers))
+      (if (string-match "^\*slime-repl.*\*$" candidate)
+          (setq buffers nil)
+        (progn
+          (setq candidate nil)
+          (setq buffers (cdr buffers)))))
+    candidate))
+
+(defun smart-slime-repl-switch ()
+  (interactive)
+  (let
+      ((slime-repl-buffer (find-slime-repl-buffer-name))
+       (current-buffer-name (buffer-name (current-buffer))))
+    (if (and slime-repl-buffer (not (string= slime-repl-buffer current-buffer-name)))
+        (switch-to-buffer (find-slime-repl-buffer-name))
+      (switch-to-buffer (other-buffer (current-buffer) 1)))))
 
 (provide 'utility)
