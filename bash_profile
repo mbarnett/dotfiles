@@ -32,6 +32,7 @@ alias ls='ls -hG'
 alias vim='/Applications/MacVim/mvim'
 alias emacs='/Applications/Emacs.app/Contents/MacOS/Emacs'
 alias gdb='cgdb'
+alias tmux="TERM=xterm-256color tmux"
 
 
 [[ -s "/Users/matt/.rvm/scripts/rvm" ]] && source "/Users/matt/.rvm/scripts/rvm" # Load RVM into a shell session *as a function*

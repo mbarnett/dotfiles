@@ -3,16 +3,22 @@
 ;; Platform tests
 
 (defun is-mac ()
+  (eq system-type 'darwin))
+
+(defun is-gui ()
+  (not (eq window-system nil)))
+
+(defun is-mac-gui ()
   (and 
-   (eq system-type 'darwin)
-   (not (eq window-system nil))))
+   (is-mac)
+   (is-gui)))
 
 ;; Portably specify default fonts like Apple Menlo
 
 (setq fallback-font "Courier-12")
 
 (defun set-font-if-exists (font)
-  (if (not (eq window-system nil))
+  (if (is-gui)
       (if (null (x-list-fonts font))
           (set-default-font fallback-font) (set-default-font font))
     nil))

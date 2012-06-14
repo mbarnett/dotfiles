@@ -15,6 +15,7 @@
 (add-to-list 'load-path local-pkg-dir)
 (add-to-list 'load-path pkg-dir)
 (add-to-list 'load-path (concat pkg-dir "/w3m"))
+(add-to-list 'load-path (concat local-pkg-dir "/shaved-yak"))
 
 
 ;; My utilities
@@ -22,26 +23,32 @@
 (require 'utility)
 
 
+;; CUA for regions only
+
+(cua-selection-mode t)
+
+
 ;; Niceties
 
-(setq backup-by-copying t)          ; Don't clobber symlinks
-(setq version-control t)            ; Keep multiple backups
-(setq delete-old-versions t)        ; Clean out old backups
-(setq kept-new-versions 5)          ; Keep the 5 newest versions
-(setq kept-old-versions 1)          ; Don't keep the N oldest versions
-(setq auto-save-default nil)        ; Only save when I say so
-(setq inhibit-startup-message nil)  ; I like the startup message
-(setq vc-follow-symlinks nil)       ; Ditch the error, we ain't using RVS here
-(setq ring-bell-function            ; Less beepy, more sleepy
-      'quieter-bell) 
-(setq split-height-threshold 0)     ; We always want vertical splits  
-(setq split-width-threshold nil)    ;
-
-(setq-default tab-width 4)          ; Default tabs to 4 spaces
-(setq-default indent-tabs-mode nil) ; Don't turn leading spaces into tabs
-(setq newline-and-indent t)         ; Autoindent open-*-lines
+(setq backup-by-copying t)                  ; Don't clobber symlinks                   
+(setq version-control t)                    ; Keep multiple backups                    
+(setq delete-old-versions t)                ; Clean out old backups                    
+(setq kept-new-versions 5)                  ; Keep the 5 newest versions               
+(setq kept-old-versions 1)                  ; Don't keep the N oldest versions         
+(setq auto-save-default nil)                ; Only save when I say so                  
+(setq inhibit-startup-message nil)          ; I like the startup message               
+(setq vc-follow-symlinks nil)               ; Ditch the error, we ain't using RVS here 
+(setq ring-bell-function                    ; Less beepy, more sleepy                  
+      'quieter-bell)                                                                   
+(setq split-height-threshold 0)             ; We always want vertical splits           
+(setq split-width-threshold nil)            ;                                          
+                                                                                       
+(setq-default tab-width 4)                  ; Default tabs to 4 spaces                 
+(setq-default indent-tabs-mode nil)         ; Don't turn leading spaces into tabs      
+(setq newline-and-indent t)                 ; Autoindent open-*-lines                  
 
 ;; Settings for hippie-expand
+
 (setq hippie-expand-try-functions-list
       '(try-expand-dabbrev
         try-expand-dabbrev-from-kill
@@ -49,21 +56,19 @@
         try-expand-line
         try-complete-file-name-partially
         try-complete-file-name))
+
 (setq smart-tab-using-hippie-expand t)
 
 (fset 'yes-or-no-p 'y-or-n-p)       ; Those long-form questions are annoying
 
 (global-font-lock-mode 1)           ; Syntax highlighting
 (delete-selection-mode t)           ; Overwrite selections when you type
-(scroll-bar-mode -1)                ; Remove the scollbar
-(tool-bar-mode -1)                  ; Enable tool bar
 (show-paren-mode t)                 ; Highlight the matching paren
 (column-number-mode t)              ; Show column number in modeline
-(set-fringe-style 'half)            ; Half-sized gutters on the edges
 (set-backup-dir backup-dir)         ; Keep the filesystem tidy
 (transient-mark-mode 1)             ; I prefer transient mark mode
-(blink-cursor-mode -1)
-
+;(blink-cursor-mode -1)
+(set-default 'cursor-type 'bar)
 
 ;; Font and Appearance
 
@@ -77,31 +82,21 @@
 
 (add-to-list 'default-frame-alist '(height . 49))
 (add-to-list 'default-frame-alist '(width . 160))
- 
 
-;; Mac specific stuff
-
-(if (is-mac)
-    (progn
-      (ns-set-resource nil "ApplePressAndHoldEnabled" "NO")
-      (setq ns-pop-up-frames nil)
-      (setq browse-url-browser-function 'rcy-browse-url-default-macosx-browser)
-
-      (setq mac-option-key-is-meta nil)
-      (setq mac-command-key-is-meta t)
-      (setq mac-command-modifier 'meta)
-      (setq mac-option-modifier nil)))
 
 ;; Key rebindings
 
-(global-set-key (kbd "C-w") 'back-kill-or-kill-region)
-(global-set-key (kbd "M-/") 'comment-region)
-(global-set-key (kbd "C-x C-b") 'switch-to-buffer)
-(global-set-key (kbd "C-o") 'open-next-line)
-(global-set-key (kbd "M-o") 'open-previous-line)
+(global-set-key (kbd "C-w") 'back-kill-or-kill-region)  
+(global-set-key (kbd "M-/") 'comment-region)            
+(global-set-key (kbd "C-x C-b") 'switch-to-buffer)      
+(global-set-key (kbd "C-o") 'open-next-line)            
+(global-set-key (kbd "M-o") 'open-previous-line)        
 (global-set-key (kbd "C-a") 'move-start-of-line-or-prev-line)
 (global-set-key (kbd "C-e") 'move-end-of-line-or-next-line)
-(global-set-key (kbd "C-;") 'smart-slime-repl-switch)
+(global-set-key (kbd "C-;") 'smart-slime-repl-switch)   
+(global-set-key (kbd "M-<RET>") 'cua-set-rectangle-mark)
+
+
 
 ;; Basic code settings
 
@@ -146,24 +141,27 @@
 (setq auto-mode-alist (cons '("\\.mm$" . objc-mode) auto-mode-alist))
 
 
+;; Go
+
+(require 'go-mode-load)
+
 ;; Tabbar
 
-(require 'tabbar)
-(require 'tabbar-ruler)
+;; (require 'tabbar)
+;; (require 'tabbar-ruler)
 
-(setq tabbar-buffer-groups-function
-      (lambda ()
-        (list "All Buffers")))
+;; (setq tabbar-buffer-groups-function
+;;       (lambda ()
+;;         (list "All Buffers")))
 
-(setq tabbar-buffer-list-function
-      (lambda ()
-        (remove-if
-         (lambda(buffer)
-           (find (aref (buffer-name buffer) 0) " *"))
-         (buffer-list))))
+;; (setq tabbar-buffer-list-function
+;;       (lambda ()
+;;         (remove-if
+;;          (lambda(buffer)
+;;            (find (aref (buffer-name buffer) 0) " *"))
+;;          (buffer-list))))
 
-
-(setq EmacsPortable-global-tabbar 't)
+;; (setq EmacsPortable-global-tabbar 't)
 
 
 ;; Speedbar
@@ -233,13 +231,48 @@
 ;; Nyan mode
 
 (require 'nyan-mode)
+
 (nyan-mode 1)
 
 
 ;; Multi-term mode
+
 (require 'multi-term)
+
 (setq multi-term-program "/usr/local/bin/fish")
 (add-to-list 'smart-tab-disabled-major-modes 'term-mode)
+
+
+;; Shaved Yak
+
+(require 'shaved-yak)
+
+(global-set-key (kbd "M-p") 'shaved-yak-goto-file)
+
+
+;; Mac & GUI specific stuff
+
+(if (is-gui)
+    (progn
+      (scroll-bar-mode -1)
+      (tool-bar-mode -1)
+      (set-fringe-style 'half)))
+
+(if (not (is-gui))
+    (menu-bar-mode -1))
+
+(if (is-mac)
+    (progn
+      (setq browse-url-browser-function 'rcy-browse-url-default-macosx-browser)
+      (setq mac-option-key-is-meta nil)
+      (setq mac-command-key-is-meta t)
+      (setq mac-command-modifier 'meta)
+      (setq mac-option-modifier nil)))
+
+(if (is-mac-gui)
+    (progn
+      (ns-set-resource nil "ApplePressAndHoldEnabled" "NO")
+      (setq ns-pop-up-frames nil)))
 
 
 ;; Custom-set-variables stuff
@@ -249,7 +282,7 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(custom-safe-themes (quote ("80d0ca69001b0896fe496f20ed9223ee25b9e416" default))))
+'(custom-safe-themes (quote ("80d0ca69001b0896fe496f20ed9223ee25b9e416" default))))
 
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
