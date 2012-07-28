@@ -30,7 +30,7 @@ export PS1="$BLACK\h: \w$RED\$(parse_git_branch)$BLACK\$$RESET "
 
 alias ls='ls -hG'
 alias vim='/Applications/MacVim/mvim'
-alias emacs='/Applications/Emacs.app/Contents/MacOS/Emacs'
+alias emacs='open -a /Applications/Emacs.app $1'
 alias gdb='cgdb'
 alias tmux="TERM=xterm-256color tmux"
 

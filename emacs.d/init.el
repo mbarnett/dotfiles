@@ -69,12 +69,13 @@
 (transient-mark-mode 1)             ; I prefer transient mark mode
 ;(blink-cursor-mode -1)
 (set-default 'cursor-type 'bar)
+(global-linum-mode 1)
 
 ;; Font and Appearance
 
 (setq custom-theme-directory        ; Keep themes in their own sub-directories
       theme-dir)
-(load-theme 'naquadah)
+(load-theme 'naquadah t)
 (set-font-if-exists "Menlo-12")     ; Sweet Menlo
 
 
@@ -274,16 +275,13 @@
       (ns-set-resource nil "ApplePressAndHoldEnabled" "NO")
       (setq ns-pop-up-frames nil)))
 
-
-;; Custom-set-variables stuff
-
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
-'(custom-safe-themes (quote ("80d0ca69001b0896fe496f20ed9223ee25b9e416" default))))
-
+ '(custom-enabled-themes (quote (naquadah)))
+ '(custom-safe-themes (quote ("7312b8cec90bc1c59cd1470a49a7ad23adae013ab525119b24b4e9ec1a3dfff8" default))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.

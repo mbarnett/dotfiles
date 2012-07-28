@@ -6,4 +6,4 @@
     (load quicklisp-init)))
 
 
-(push #p"Source/hula-girl/" asdf:*central-registry*)
+;;(push #p"Source/hula-girl/" asdf:*central-registry*)
