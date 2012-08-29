@@ -1,8 +1,10 @@
 (set-language-environment "utf-8")
 
 
-;; Constants
 
+;;; Constants
+
+(setq fallback-font "Courier-12")
 (setq config-dir (expand-file-name "~/.emacs.d/"))
 (setq backup-dir (concat config-dir "backups"))
 (setq local-pkg-dir (concat config-dir "local-elisp"))
@@ -10,7 +12,8 @@
 (setq theme-dir (concat config-dir "themes"))
 
 
-;; Load paths
+
+;;; Load paths
 
 (add-to-list 'load-path local-pkg-dir)
 (add-to-list 'load-path pkg-dir)
@@ -18,14 +21,126 @@
 (add-to-list 'load-path (concat local-pkg-dir "/shaved-yak"))
 
 
-;; My utilities
 
-(require 'utility)
+;;; Functions
+
+(defun is-mac ()
+  (eq system-type 'darwin))
+
+(defun is-gui ()
+  (not (eq window-system nil)))
+
+(defun is-mac-gui ()
+  (and 
+   (is-mac)
+   (is-gui)))
 
 
-;; CUA for regions only
+(defun set-font-if-exists (font)
+  (if (is-gui)
+      (if (null (x-list-fonts font))
+          (set-default-font fallback-font) (set-default-font font))
+    nil))
 
-(cua-selection-mode t)
+
+(defun quieter-bell ()
+  (unless (memq this-command
+    	'(isearch-abort abort-recursive-edit exit-minibuffer
+              keyboard-quit mwheel-scroll down up next-line previous-line
+              backward-char forward-char))
+    (ding)))
+
+
+(defun set-backup-dir (dir)
+  (setq backup-directory-alist
+        `(( "." . ,dir))))
+
+
+; Like vi's o command
+(defun open-next-line (arg)
+  "Move to the next line and then opens a line.
+    See also `newline-and-indent'."
+  (interactive "p")
+  (end-of-line)
+  (open-line arg)
+  (next-line 1)
+  (when newline-and-indent
+    (indent-according-to-mode)))
+
+; Like vi's O command
+(defun open-previous-line (arg)
+  "Open a new line before the current one. 
+     See also `newline-and-indent'."
+  (interactive "p")
+  (beginning-of-line)
+  (open-line arg)
+  (when newline-and-indent
+    (indent-according-to-mode)))
+
+
+(defun back-kill-or-kill-region (arg)
+  "Kill the region if active, else backwards kill a word"
+  (interactive "p")
+  (if (and transient-mark-mode mark-active)
+      (kill-region (region-beginning) (region-end))
+    (backward-kill-word arg)))
+
+
+; For launching the default browser on os x
+(defun rcy-browse-url-default-macosx-browser (url &optional new-window)
+  (interactive (browse-url-interactive-arg "URL: "))
+  (let ((url
+	 (if (aref (url-generic-parse-url url) 0)
+	     url
+	   (concat "http://" url))))
+    (start-process (concat "open " url) nil "open" url)))
+
+
+(defun insert-hashrocket ()
+  "Inserts a hashrocket"
+  (interactive)
+  (insert " => "))
+
+
+(defun move-end-of-line-or-next-line ()
+  (interactive)
+  (if (eolp)
+      (next-line)
+      (move-end-of-line nil)))
+
+
+(defun move-start-of-line-or-prev-line ()
+  (interactive)
+  (if (bolp)
+      (previous-line)
+      (move-beginning-of-line nil)))
+
+
+; Hunt down the name of the Slime REPL buffer, if it exists
+(defun find-slime-repl-buffer-name ()
+  (let ((buffers (mapcar (function buffer-name) (buffer-list)))
+        (candidate nil))
+    (while buffers
+      (setq candidate (car buffers))
+      (if (string-match "^\*slime-repl.*\*$" candidate)
+          (setq buffers nil)
+        (progn
+          (setq candidate nil)
+          (setq buffers (cdr buffers)))))
+    candidate))
+
+(defun smart-slime-repl-switch ()
+  (interactive)
+  (let
+      ((slime-repl-buffer (find-slime-repl-buffer-name))
+       (current-buffer-name (buffer-name (current-buffer))))
+    (if (and slime-repl-buffer (not (string= slime-repl-buffer current-buffer-name)))
+        (switch-to-buffer (find-slime-repl-buffer-name))
+      (switch-to-buffer (other-buffer (current-buffer) 1)))))
+
+
+
+;;; Settings
 
 
 ;; Niceties
@@ -45,38 +160,30 @@
                                                                                        
 (setq-default tab-width 4)                  ; Default tabs to 4 spaces                 
 (setq-default indent-tabs-mode nil)         ; Don't turn leading spaces into tabs      
-(setq newline-and-indent t)                 ; Autoindent open-*-lines                  
+(setq newline-and-indent t)                 ; Autoindent open-*-lines
 
-;; Settings for hippie-expand
+(fset 'yes-or-no-p 'y-or-n-p)               ; Those long-form questions are annoying
 
-(setq hippie-expand-try-functions-list
-      '(try-expand-dabbrev
-        try-expand-dabbrev-from-kill
-        try-expand-dabbrev-all-buffers
-        try-expand-line
-        try-complete-file-name-partially
-        try-complete-file-name))
-
-(setq smart-tab-using-hippie-expand t)
-
-(fset 'yes-or-no-p 'y-or-n-p)       ; Those long-form questions are annoying
-
-(global-font-lock-mode 1)           ; Syntax highlighting
-(delete-selection-mode t)           ; Overwrite selections when you type
-(show-paren-mode t)                 ; Highlight the matching paren
-(column-number-mode t)              ; Show column number in modeline
-(set-backup-dir backup-dir)         ; Keep the filesystem tidy
-(transient-mark-mode 1)             ; I prefer transient mark mode
+(global-font-lock-mode 1)                   ; Syntax highlighting
+(delete-selection-mode t)                   ; Overwrite selections when you type
+(show-paren-mode t)                         ; Highlight the matching paren
+(column-number-mode t)                      ; Show column number in modeline
+(set-backup-dir backup-dir)                 ; Keep the filesystem tidy
+(transient-mark-mode 1)                     ; I prefer transient mark mode
 ;(blink-cursor-mode -1)
-(set-default 'cursor-type 'bar)
 (global-linum-mode 1)
+(cua-selection-mode t)                      ; CUA for regions only
+
+
+
+;;; Interface
+
 
 ;; Font and Appearance
 
-(setq custom-theme-directory        ; Keep themes in their own sub-directories
-      theme-dir)
+(setq custom-theme-directory theme-dir)      ; Keep themes in their own sub-directories
 (load-theme 'naquadah t)
-(set-font-if-exists "Menlo-12")     ; Sweet Menlo
+(set-font-if-exists "Menlo-12")              ; Sweet Menlo
 
 
 ;; Default frame size
@@ -97,6 +204,104 @@
 (global-set-key (kbd "C-;") 'smart-slime-repl-switch)   
 (global-set-key (kbd "M-<RET>") 'cua-set-rectangle-mark)
 
+
+;; Mac & GUI specific stuff
+
+(if (is-gui)
+    (progn
+      (scroll-bar-mode -1)
+      (tool-bar-mode -1)
+      (set-fringe-style 'half)))
+
+(if (not (is-gui))
+    (menu-bar-mode -1))
+
+(if (is-mac)
+    (progn
+      (setq browse-url-browser-function 'rcy-browse-url-default-macosx-browser)
+      (setq mac-option-key-is-meta nil)
+      (setq mac-command-key-is-meta t)
+      (setq mac-command-modifier 'meta)
+      (setq mac-option-modifier nil)))
+
+(if (is-mac-gui)
+    (progn
+      (ns-set-resource nil "ApplePressAndHoldEnabled" "NO")
+      (setq ns-pop-up-frames nil)))
+
+
+;; w3m Config
+
+(require 'w3m-load)
+
+(setq w3m-command "/usr/local/bin/w3m")
+(setq browse-url-browser-function 'w3m-browse-url)
+(autoload 'w3m-browse-url "w3m" "Ask a WWW browser to show a URL." t)
+(global-set-key "\C-xm" 'browse-url-at-point) ; Browse url at point with C-x m
+
+
+;; Nyan mode
+
+(require 'nyan-mode)
+
+(nyan-mode 1)
+
+
+;; Tabbar
+
+(require 'tabbar)
+(require 'tabbar-ruler)
+
+(setq tabbar-buffer-groups-function
+      (lambda ()
+        (list "All Buffers")))
+
+(setq tabbar-buffer-list-function
+      (lambda ()
+        (remove-if
+         (lambda(buffer)
+           (find (aref (buffer-name buffer) 0) " *"))
+         (buffer-list))))
+
+(setq EmacsPortable-global-tabbar 't)
+
+
+;; Speedbar
+
+(require 'speedbar)
+(require 'sr-speedbar)
+
+(setq speedbar-use-images nil)
+(setq sr-speedbar-right-side nil)
+(speedbar-add-supported-extension ".rb")
+(speedbar-add-supported-extension ".yml")
+(speedbar-add-supported-extension ".lisp")
+(speedbar-add-supported-extension ".asd")
+(setq sr-speedbar-auto-refresh nil)
+(global-set-key [f1] 'sr-speedbar-toggle)
+
+
+;; Smart Tab dynamic completions
+
+(require 'smart-tab)
+(global-smart-tab-mode 1)
+
+
+;; Settings for hippie-expand
+
+(setq hippie-expand-try-functions-list
+      '(try-expand-dabbrev
+        try-expand-dabbrev-from-kill
+        try-expand-dabbrev-all-buffers
+        try-expand-line
+        try-complete-file-name-partially
+        try-complete-file-name))
+
+(setq smart-tab-using-hippie-expand t)
+
+
+
+;;; Development
 
 
 ;; Basic code settings
@@ -146,45 +351,6 @@
 
 (require 'go-mode-load)
 
-;; Tabbar
-
-;; (require 'tabbar)
-;; (require 'tabbar-ruler)
-
-;; (setq tabbar-buffer-groups-function
-;;       (lambda ()
-;;         (list "All Buffers")))
-
-;; (setq tabbar-buffer-list-function
-;;       (lambda ()
-;;         (remove-if
-;;          (lambda(buffer)
-;;            (find (aref (buffer-name buffer) 0) " *"))
-;;          (buffer-list))))
-
-;; (setq EmacsPortable-global-tabbar 't)
-
-
-;; Speedbar
-
-(require 'speedbar)
-(require 'sr-speedbar)
-
-(setq speedbar-use-images nil)
-(setq sr-speedbar-right-side nil)
-(speedbar-add-supported-extension ".rb")
-(speedbar-add-supported-extension ".yml")
-(speedbar-add-supported-extension ".lisp")
-(speedbar-add-supported-extension ".asd")
-(setq sr-speedbar-auto-refresh nil)
-(global-set-key [f1] 'sr-speedbar-toggle)
-
-
-;; Smart Tab dynamic completions
-
-(require 'smart-tab)
-(global-smart-tab-mode 1)
-
 
 ;; eproject
 
@@ -211,37 +377,12 @@
       '((ccl ("/usr/local/bin/ccl64"))
         (ccl32 ("/usr/local/bin/ccl"))
         (sbcl ("/usr/local/bin/sbcl"))
-        (clisp ("/usr/local/bin/clisp"))
-        (cmucl ("/usr/local/bin/lisp"))))
+        (clisp ("/usr/local/bin/cmucl"))
+        (clisp ("/usr/local/bin/load"))))
 
 (load (expand-file-name "~/.quicklisp/slime-helper.el"))
 (setq slime-net-coding-system 'utf-8-unix) ; utf-8 support for clozure 
 (slime-setup '(slime-fancy slime-banner))
-
-
-;; w3m Config
-
-(require 'w3m-load)
-
-(setq w3m-command "/usr/local/bin/w3m")
-(setq browse-url-browser-function 'w3m-browse-url)
-(autoload 'w3m-browse-url "w3m" "Ask a WWW browser to show a URL." t)
-(global-set-key "\C-xm" 'browse-url-at-point) ; Browse url at point with C-x m
-
-
-;; Nyan mode
-
-(require 'nyan-mode)
-
-(nyan-mode 1)
-
-
-;; Multi-term mode
-
-(require 'multi-term)
-
-(setq multi-term-program "/usr/local/bin/fish")
-(add-to-list 'smart-tab-disabled-major-modes 'term-mode)
 
 
 ;; Shaved Yak
@@ -250,30 +391,6 @@
 
 (global-set-key (kbd "M-p") 'shaved-yak-goto-file)
 
-
-;; Mac & GUI specific stuff
-
-(if (is-gui)
-    (progn
-      (scroll-bar-mode -1)
-      (tool-bar-mode -1)
-      (set-fringe-style 'half)))
-
-(if (not (is-gui))
-    (menu-bar-mode -1))
-
-(if (is-mac)
-    (progn
-      (setq browse-url-browser-function 'rcy-browse-url-default-macosx-browser)
-      (setq mac-option-key-is-meta nil)
-      (setq mac-command-key-is-meta t)
-      (setq mac-command-modifier 'meta)
-      (setq mac-option-modifier nil)))
-
-(if (is-mac-gui)
-    (progn
-      (ns-set-resource nil "ApplePressAndHoldEnabled" "NO")
-      (setq ns-pop-up-frames nil)))
 
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
