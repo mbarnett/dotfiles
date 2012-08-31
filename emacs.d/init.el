@@ -1,6 +1,20 @@
 (set-language-environment "utf-8")
 
 
+;;; Load el-get
+
+(add-to-list 'load-path "~/.emacs.d/el-get/el-get")
+
+(unless (require 'el-get nil t)
+  (url-retrieve
+   "https://raw.github.com/dimitri/el-get/master/el-get-install.el"
+   (lambda (s)
+     (goto-char (point-max))
+     (eval-print-last-sexp))))
+
+(el-get 'sync)
+
+
 
 ;;; Constants
 
@@ -8,16 +22,15 @@
 (setq config-dir (expand-file-name "~/.emacs.d/"))
 (setq backup-dir (concat config-dir "backups"))
 (setq local-pkg-dir (concat config-dir "local-elisp"))
-(setq pkg-dir (concat config-dir "elisp"))
 (setq theme-dir (concat config-dir "themes"))
+(setq w3m-dir (concat config-dir "w3m"))
 
 
 
 ;;; Load paths
 
+(add-to-list 'load-path w3m-dir)
 (add-to-list 'load-path local-pkg-dir)
-(add-to-list 'load-path pkg-dir)
-(add-to-list 'load-path (concat pkg-dir "/w3m"))
 (add-to-list 'load-path (concat local-pkg-dir "/shaved-yak"))
 
 
@@ -138,6 +151,25 @@
         (switch-to-buffer (find-slime-repl-buffer-name))
       (switch-to-buffer (other-buffer (current-buffer) 1)))))
 
+(defcustom linum-disabled-modes-list '(eshell-mode wl-summary-mode compilation-mode org-mode text-mode dired-mode)
+  "* List of modes disabled when global linum mode is on"
+  :type '(repeat (sexp :tag "Major mode"))
+  :tag " Major modes where linum is disabled: "
+  :group 'linum
+  )
+(defcustom linum-disable-starred-buffers 't
+  "* Disable buffers that have stars in them like *Gnu Emacs*"
+  :type 'boolean
+  :group 'linum)
+
+(defun linum-on ()
+  "* When linum is running globally, disable line number in modes defined in `linum-disabled-modes-list'. Changed by linum-off. Also turns off numbering in starred modes like *scratch*"
+
+  (unless (or (minibufferp) (member major-mode linum-disabled-modes-list)
+              (and linum-disable-starred-buffers (string-match "*" (buffer-name)))
+              )
+    (linum-mode 1)))
+
 
 
 ;;; Settings
@@ -171,7 +203,6 @@
 (set-backup-dir backup-dir)                 ; Keep the filesystem tidy
 (transient-mark-mode 1)                     ; I prefer transient mark mode
 ;(blink-cursor-mode -1)
-(global-linum-mode 1)
 (cua-selection-mode t)                      ; CUA for regions only
 
 
@@ -230,9 +261,17 @@
       (setq ns-pop-up-frames nil)))
 
 
+;; Line numbers
+
+(require 'linum)
+
+(setq linum-format " %d ")
+(global-linum-mode 1)
+
+
 ;; w3m Config
 
-(require 'w3m-load)
+;(require 'w3m-load)
 
 (setq w3m-command "/usr/local/bin/w3m")
 (setq browse-url-browser-function 'w3m-browse-url)
@@ -283,8 +322,8 @@
 
 ;; Smart Tab dynamic completions
 
-(require 'smart-tab)
-(global-smart-tab-mode 1)
+;(require 'smart-tab)
+;(global-smart-tab-mode 1)
 
 
 ;; Settings for hippie-expand
@@ -297,7 +336,7 @@
         try-complete-file-name-partially
         try-complete-file-name))
 
-(setq smart-tab-using-hippie-expand t)
+;(setq smart-tab-using-hippie-expand t)
 
 
 
@@ -345,11 +384,6 @@
 ;; ObjC
 
 (setq auto-mode-alist (cons '("\\.mm$" . objc-mode) auto-mode-alist))
-
-
-;; Go
-
-(require 'go-mode-load)
 
 
 ;; eproject
