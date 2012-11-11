@@ -3,6 +3,59 @@
 ;;; Code:
 
 
+;;;### (autoloads (ace-jump-mode ace-jump-line-mode ace-jump-word-mode
+;;;;;;  ace-jump-char-mode ace-jump-mode-pop-mark) "ace-jump-mode/ace-jump-mode"
+;;;;;;  "ace-jump-mode/ace-jump-mode.el" (20584 57485))
+;;; Generated autoloads from ace-jump-mode/ace-jump-mode.el
+
+(autoload 'ace-jump-mode-pop-mark "ace-jump-mode/ace-jump-mode" "\
+Pop up a postion from `ace-jump-mode-mark-ring', and jump back to that position
+
+\(fn)" t nil)
+
+(autoload 'ace-jump-char-mode "ace-jump-mode/ace-jump-mode" "\
+AceJump char mode
+
+\(fn QUERY-CHAR)" t nil)
+
+(autoload 'ace-jump-word-mode "ace-jump-mode/ace-jump-mode" "\
+AceJump word mode.
+You can set `ace-jump-word-mode-use-query-char' to nil to prevent
+asking for a head char, that will mark all the word in current
+buffer.
+
+\(fn HEAD-CHAR)" t nil)
+
+(autoload 'ace-jump-line-mode "ace-jump-mode/ace-jump-mode" "\
+AceJump line mode.
+Marked each no empty line and move there
+
+\(fn)" t nil)
+
+(autoload 'ace-jump-mode "ace-jump-mode/ace-jump-mode" "\
+AceJump mode is a minor mode for you to quick jump to a
+position in the curret view.
+   There is three submode now:
+     `ace-jump-char-mode'
+     `ace-jump-word-mode'
+     `ace-jump-line-mode'
+
+You can specify the sequence about which mode should enter
+by customize `ace-jump-mode-submode-list'.
+
+If you do not want to query char for word mode, you can change
+`ace-jump-word-mode-use-query-char' to nil.
+
+If you don't like the default move keys, you can change it by
+setting `ace-jump-mode-move-keys'.
+
+You can constrol whether use the case sensitive via
+`ace-jump-mode-case-fold'.
+
+\(fn &optional PREFIX)" t nil)
+
+;;;***
+
 ;;;### (autoloads (el-get-checksum el-get-make-recipes el-get-cd
 ;;;;;;  el-get-self-update el-get-update-all el-get-version) "el-get/el-get"
 ;;;;;;  "el-get/el-get.el" (20544 16063))
@@ -133,7 +186,7 @@ With the prefix arg LOOK-IN-INVISIBLE-BUFFERS looks in buffers that are not curr
 ;;;***
 
 ;;;### (autoloads (godoc gofmt-before-save gofmt go-mode) "go-mode/go-mode"
-;;;;;;  "go-mode/go-mode.el" (20544 16493))
+;;;;;;  "go-mode/go-mode.el" (20584 57668))
 ;;; Generated autoloads from go-mode/go-mode.el
 
 (autoload 'go-mode "go-mode/go-mode" "\
@@ -190,6 +243,28 @@ option `scroll-bar-mode'.
 
 ;;;***
 
+;;;### (autoloads (smart-tabs-advice smart-tabs-mode-enable smart-tabs-mode)
+;;;;;;  "smarttabs/smart-tabs-mode" "smarttabs/smart-tabs-mode.el"
+;;;;;;  (20636 4852))
+;;; Generated autoloads from smarttabs/smart-tabs-mode.el
+
+(autoload 'smart-tabs-mode "smarttabs/smart-tabs-mode" "\
+Intelligently indent with tabs, align with spaces!
+
+\(fn &optional ARG)" t nil)
+
+(autoload 'smart-tabs-mode-enable "smarttabs/smart-tabs-mode" "\
+Enable smart-tabs-mode.
+
+\(fn)" nil nil)
+
+(autoload 'smart-tabs-advice "smarttabs/smart-tabs-mode" "\
+
+
+\(fn FUNCTION OFFSET)" nil (quote macro))
+
+;;;***
+
 ;;;### (autoloads (tabbar-mwheel-mode tabbar-mode tabbar-local-mode
 ;;;;;;  tabbar-mwheel-switch-group tabbar-mwheel-switch-tab tabbar-mwheel-forward-tab
 ;;;;;;  tabbar-mwheel-backward-tab tabbar-mwheel-forward-group tabbar-mwheel-backward-group
@@ -197,7 +272,7 @@ option `scroll-bar-mode'.
 ;;;;;;  tabbar-press-scroll-left tabbar-press-home tabbar-forward-tab
 ;;;;;;  tabbar-backward-tab tabbar-forward-group tabbar-backward-group
 ;;;;;;  tabbar-forward tabbar-backward) "tabbar/tabbar" "tabbar/tabbar.el"
-;;;;;;  (20544 16568))
+;;;;;;  (20584 57676))
 ;;; Generated autoloads from tabbar/tabbar.el
 
 (autoload 'tabbar-backward "tabbar/tabbar" "\
@@ -359,9 +434,11 @@ Returns non-nil if the new state is enabled.
 
 ;;;***
 
-;;;### (autoloads (yaml-mode) "yaml-mode/yaml-mode" "yaml-mode/yaml-mode.el"
-;;;;;;  (20544 16670))
+;;;### (autoloads (yaml-mode yaml) "yaml-mode/yaml-mode" "yaml-mode/yaml-mode.el"
+;;;;;;  (20584 57676))
 ;;; Generated autoloads from yaml-mode/yaml-mode.el
+
+(let ((loads (get 'yaml 'custom-loads))) (if (member '"yaml-mode/yaml-mode" loads) nil (put 'yaml 'custom-loads (cons '"yaml-mode/yaml-mode" loads))))
 
 (autoload 'yaml-mode "yaml-mode/yaml-mode" "\
 Simple mode to edit YAML.
@@ -382,8 +459,8 @@ Simple mode to edit YAML.
 ;;;;;;  "eproject/contrib/eproject-tags.el" "eproject/contrib/helm-eproject.el"
 ;;;;;;  "eproject/eproject-tests.el" "eproject/eproject.el" "eproject/lang/eproject-perl.el"
 ;;;;;;  "eproject/lang/eproject-ruby-on-rails.el" "eproject/lang/eproject-ruby.el"
-;;;;;;  "sr-speedbar/sr-speedbar.el" "tabbar-ruler/tabbar-ruler.el")
-;;;;;;  (20544 16670 668931))
+;;;;;;  "linum-off/linum-off.el" "sr-speedbar/sr-speedbar.el" "tabbar-ruler/tabbar-ruler.el")
+;;;;;;  (20636 5037 141727))
 
 ;;;***
 
