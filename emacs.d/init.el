@@ -1,6 +1,5 @@
 (set-language-environment "utf-8")
 
-
 ;;; Load el-get
 
 (add-to-list 'load-path "~/.emacs.d/el-get/el-get")
@@ -54,14 +53,6 @@
       (if (null (x-list-fonts font))
           (set-default-font fallback-font) (set-default-font font))
     nil)))
-
-
-(defun quieter-bell ()
-  (unless (memq this-command
-    	'(isearch-abort abort-recursive-edit exit-minibuffer
-              keyboard-quit mwheel-scroll down up next-line previous-line
-              backward-char forward-char))
-    (ding)))
 
 
 (defun set-backup-dir (dir)
@@ -151,6 +142,95 @@
         (switch-to-buffer (find-slime-repl-buffer-name))
       (switch-to-buffer (other-buffer (current-buffer) 1)))))
 
+; override the pop-to-buffer with pop-to-buffer-same-window
+; when going to references in compilation buffers
+(defun compilation-goto-locus (msg mk end-mk)
+  "Jump to an error corresponding to MSG at MK.
+All arguments are markers.  If END-MK is non-nil, mark is set there
+and overlay is highlighted between MK and END-MK."
+  ;; Show compilation buffer in other window, scrolled to this error.
+  (let* ((from-compilation-buffer (eq (window-buffer (selected-window))
+                                      (marker-buffer msg)))
+         ;; Use an existing window if it is in a visible frame.
+         (pre-existing (get-buffer-window (marker-buffer msg) 0))
+         (w (if (and from-compilation-buffer pre-existing)
+                ;; Calling display-buffer here may end up (partly) hiding
+                ;; the error location if the two buffers are in two
+                ;; different frames.  So don't do it if it's not necessary.
+                pre-existing
+              (let ((display-buffer-reuse-frames t)
+                    (pop-up-windows t))
+		;; Pop up a window.
+                (display-buffer (marker-buffer msg)))))
+	 (highlight-regexp (with-current-buffer (marker-buffer msg)
+			     ;; also do this while we change buffer
+			     (compilation-set-window w msg)
+			     compilation-highlight-regexp)))
+    ;; Ideally, the window-size should be passed to `display-buffer'
+    ;; so it's only used when creating a new window.
+    (unless pre-existing (compilation-set-window-height w))
+
+    (if from-compilation-buffer
+        ;; If the compilation buffer window was selected,
+        ;; keep the compilation buffer in this window;
+        ;; display the source in another window.
+        (let ((pop-up-windows t))
+          (pop-to-buffer-same-window (marker-buffer mk) 'other-window))
+      (switch-to-buffer (marker-buffer mk)))
+    (unless (eq (goto-char mk) (point))
+      ;; If narrowing gets in the way of going to the right place, widen.
+      (widen)
+      (if next-error-move-function
+	  (funcall next-error-move-function msg mk)
+	(goto-char mk)))
+    (if end-mk
+        (push-mark end-mk t)
+      (if mark-active (setq mark-active)))
+    ;; If hideshow got in the way of
+    ;; seeing the right place, open permanently.
+    (dolist (ov (overlays-at (point)))
+      (when (eq 'hs (overlay-get ov 'invisible))
+        (delete-overlay ov)
+        (goto-char mk)))
+
+    (when highlight-regexp
+      (if (timerp next-error-highlight-timer)
+	  (cancel-timer next-error-highlight-timer))
+      (unless compilation-highlight-overlay
+	(setq compilation-highlight-overlay
+	      (make-overlay (point-min) (point-min)))
+	(overlay-put compilation-highlight-overlay 'face 'next-error))
+      (with-current-buffer (marker-buffer mk)
+	(save-excursion
+	  (if end-mk (goto-char end-mk) (end-of-line))
+	  (let ((end (point)))
+	    (if mk (goto-char mk) (beginning-of-line))
+	    (if (and (stringp highlight-regexp)
+		     (re-search-forward highlight-regexp end t))
+		(progn
+		  (goto-char (match-beginning 0))
+		  (move-overlay compilation-highlight-overlay
+				(match-beginning 0) (match-end 0)
+				(current-buffer)))
+	      (move-overlay compilation-highlight-overlay
+			    (point) end (current-buffer)))
+	    (if (or (eq next-error-highlight t)
+		    (numberp next-error-highlight))
+		;; We want highlighting: delete overlay on next input.
+		(add-hook 'pre-command-hook
+			  'compilation-goto-locus-delete-o)
+	      ;; We don't want highlighting: delete overlay now.
+	      (delete-overlay compilation-highlight-overlay))
+	    ;; We want highlighting for a limited time:
+	    ;; set up a timer to delete it.
+	    (when (numberp next-error-highlight)
+	      (setq next-error-highlight-timer
+		    (run-at-time next-error-highlight nil
+				 'compilation-goto-locus-delete-o)))))))
+    (when (and (eq next-error-highlight 'fringe-arrow))
+      ;; We want a fringe arrow (instead of highlighting).
+      (setq next-error-overlay-arrow-position
+	    (copy-marker (line-beginning-position))))))
 
 
 
@@ -167,26 +247,33 @@
 (setq auto-save-default nil)                ; Only save when I say so                  
 (setq inhibit-startup-message t)
 (setq vc-follow-symlinks nil)               ; Ditch the error, we ain't using RVS here 
-(setq ring-bell-function                    ; Less beepy, more sleepy                  
-      'quieter-bell)                                                                   
-(setq split-height-threshold 0)             ; We always want vertical splits           
+(setq split-height-threshold 0)
 (setq split-width-threshold nil)                 
 (setq-default tab-width 4)                  ; Default tabs to 4 spaces
 (setq newline-and-indent t)                 ; Autoindent open-*-lines
-(setq cursor-type 'bar)
+
 
 (fset 'yes-or-no-p 'y-or-n-p)               ; Those long-form questions are annoying
 
 (global-font-lock-mode 1)                   ; Syntax highlighting
 (delete-selection-mode t)                   ; Overwrite selections when you type
-(show-paren-mode t)                         ; Highlight the matching paren
+(show-paren-mode t)
+(setq show-paren-style 'expression)
 (column-number-mode t)                      ; Show column number in modeline
 (set-backup-dir backup-dir)                 ; Keep the filesystem tidy
 (transient-mark-mode 1)                     ; I prefer transient mark mode
 (cua-selection-mode t)                      ; CUA for regions only
 (desktop-save-mode 1)
+(global-auto-revert-mode t)
+(setq mouse-wheel-progressive-speed nil)
+(setq ring-bell-function 'ignore)
 
 
+(set-default 'cursor-type 'bar)
+
+
+(add-to-list 'same-window-buffer-names "*inferior-lisp*")
+(add-to-list 'same-window-buffer-names "*ack*")
 
 ;;; Interface
 
@@ -227,8 +314,7 @@
 (if (is-gui)
     (progn
       (scroll-bar-mode -1)
-      (tool-bar-mode -1)
-      (set-fringe-style 'half)))
+      (tool-bar-mode -1)))
 
 (if (not (is-gui))
     (menu-bar-mode -1))
@@ -244,7 +330,8 @@
 (if (is-mac-gui)
     (progn
       (ns-set-resource nil "ApplePressAndHoldEnabled" "NO")
-      (setq ns-pop-up-frames nil)))
+      (setq ns-pop-up-frames nil)
+      (set-fringe-mode 0)))
 
 
 ;; Line numbers
@@ -280,8 +367,13 @@
       (lambda ()
         (remove-if
          (lambda(buffer)
-           (find (aref (buffer-name buffer) 0) " *"))
+           (let ((bname (buffer-name buffer)))
+             (and 
+              (find  (aref bname 0) " *")
+              (not (member bname '("*scratch*" "*ack*")))
+              (not (string-prefix-p "*slime-repl" bname)))))
          (buffer-list))))
+
 (setq tabbar-cycle-scope (quote tabs))
 (setq table-time-before-update 0.1)
 (setq tabbar-use-images t)
@@ -294,6 +386,7 @@
 (global-set-key (kbd "M-[ c") 'tabbar-forward)
 (global-set-key [C-left] 'tabbar-backward)
 (global-set-key [C-right] 'tabbar-forward)
+
 
 (tabbar-mode t)
 
@@ -311,23 +404,22 @@
 
 
 ;; Smart Tab dynamic completions
+
 (require 'smart-tab)
 (global-smart-tab-mode 1)
 
 
-;; Settings for hippie-expand
+;; hl-line
 
-;; (setq hippie-expand-try-functions-list
-;;       '(try-expand-dabbrev
-;;         try-expand-dabbrev-from-kill
-;;         try-expand-dabbrev-all-buffers
-;;         try-expand-line
-;;         try-complete-file-name-partially
-;;         try-complete-file-name))
+(global-hl-line-mode 1)
 
-;(setq smart-tab-using-hippie-expand t)
-;(require 'tabkey2)
-;(tabkey2-mode 1)
+
+;; pbcopy for OS X
+
+(if (is-mac)
+    (progn
+      (require 'pbcopy)
+      (turn-on-pbcopy)))
 
 
 ;;; Development
@@ -339,11 +431,6 @@
               tab-width 4
               indent-tabs-mode nil)
 
-;; Ack! Thbbft
-
-(require 'thbbft)
-(setq thbbft-executable "/usr/local/bin/ack")
-(global-set-key (kbd "M-S-f") 'thbbft)
 
 ;; Ruby mode settings
 
@@ -378,12 +465,24 @@
       '((ccl ("/usr/local/bin/ccl64"))
         (ccl32 ("/usr/local/bin/ccl"))
         (sbcl ("/usr/local/bin/sbcl"))
-        (clisp ("/usr/local/bin/cmucl"))
-        (clisp ("/usr/local/bin/load"))))
+        (cmucl ("/usr/local/bin/lisp"))
+        (clisp ("/usr/local/bin/clisp"))))
 
 (load (expand-file-name "~/.quicklisp/slime-helper.el"))
 (setq slime-net-coding-system 'utf-8-unix) ; utf-8 support for clozure 
 (slime-setup '(slime-fancy slime-banner))
+
+(font-lock-add-keywords
+ 'lisp-mode
+ '(("[[:space:](]\\([0-9]+\\)[[:space:])]" 1 font-lock-constant-face)
+   ("[[:space:](]\\(nil\\)[[:space:])]" 1 font-lock-constant-face)
+   ("[[:space:](]\\(t\\)[[:space:])]" 1 font-lock-constant-face)))
+
+
+
+;; Rainbow Delimiters
+
+(add-hook 'prog-mode-hook 'rainbow-delimiters-mode)
 
 
 ;; ObjC
@@ -391,28 +490,17 @@
 (setq auto-mode-alist (cons '("\\.mm$" . objc-mode) auto-mode-alist))
 
 
-;; eproject
-
-(defun eproject-grep (regexp)
-  "Search all files in the current project for REGEXP."
-  (interactive "sRegexp grep: ")
-  (let* ((root (eproject-root))
-         (default-directory root)
-         (files (eproject-list-project-files-relative root)))
-    (grep-compute-defaults)
-    (lgrep regexp (combine-and-quote-strings files) root)))
-
 
 ;; peepopen
 
 (require 'eproject-peepopen)
 
 
-;; Shaved Yak
+;; Ack
 
-(require 'shaved-yak)
+(setq ack-executable "/usr/local/bin/ack")
+(global-set-key [(meta shift f)] 'ack)
 
-(global-set-key (kbd "M-p") 'shaved-yak-goto-file)
 
 
 (custom-set-variables
@@ -421,11 +509,9 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(custom-safe-themes (quote ("fc5fcb6f1f1c1bc01305694c59a1a861b008c534cae8d0e48e4d5e81ad718bc6" "1e7e097ec8cb1f8c3a912d7e1e0331caeed49fef6cff220be63bd2a6ba4cc365" default))))
-
-(unless (is-gui)
-  (progn
-    (setq tabbar-background-color "bryellow") ;; the color of the tabbar background
-    (custom-set-faces
-     '(tabbar-default ((t (:inherit variable-pitch :background "bryellow" :foreground "bryellow" :weight bold))))
-     '(tabbar-selected ((t (:inherit tabbar-default :foreground "yellow"))))
-     '(tabbar-unselected ((t (:inherit tabbar-default)))))))
+(custom-set-faces
+ '(tabbar-default ((t (:inherit variable-pitch :background "brightyellow" :foreground "black" :weight bold))))
+ '(tabbar-selected ((t (:inherit tabbar-default :foreground "grey" :background "black"))))
+ '(tabbar-unselected ((t (:background "black" :inherit variable-pitch))))
+ '(col-highlight ((t (:background "black"))))
+ '(font-lock-constant-face ((t (:foreground "#af005f")))))

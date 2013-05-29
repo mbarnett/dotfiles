@@ -28,7 +28,7 @@ alias emacs='/Applications/Emacs.app/Contents/MacOS/Emacs -nw'
 alias tmux='tmux -2'
 alias pine='alpine'
 
-export PATH=/usr/local/bin:$PATH:$HOME/.gitscripts:$HOME/.cabal/bin:$HOME/bin
+export PATH=/usr/local/bin:/usr/local/sbin:$PATH:$HOME/.gitscripts:$HOME/.cabal/bin:$HOME/bin
 
 export CLICOLOR=1
 export LSCOLORS=ExFxCxDxBxegedabagacad

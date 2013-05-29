@@ -185,6 +185,47 @@ With the prefix arg LOOK-IN-INVISIBLE-BUFFERS looks in buffers that are not curr
 
 ;;;***
 
+;;;### (autoloads (ack-find-file ack-find-same-file ack ack-same)
+;;;;;;  "full-ack/full-ack" "full-ack/full-ack.el" (20719 33521))
+;;; Generated autoloads from full-ack/full-ack.el
+
+(autoload 'ack-same "full-ack/full-ack" "\
+Run ack with --type matching the current `major-mode'.
+The types of files searched are determined by `ack-mode-type-alist' and
+`ack-mode-extension-alist'.  If no type is configured the buffer's file
+extension is used for the search.
+PATTERN is interpreted as a regular expression, iff REGEXP is non-nil.  If
+called interactively, the value of REGEXP is determined by `ack-search-regexp'.
+A prefix arg toggles that value.
+DIRECTORY is the root directory.  If called interactively, it is determined by
+`ack-project-root-file-patterns'.  The user is only prompted, if
+`ack-prompt-for-directory' is set.
+
+\(fn PATTERN &optional REGEXP DIRECTORY)" t nil)
+
+(autoload 'ack "full-ack/full-ack" "\
+Run ack.
+PATTERN is interpreted as a regular expression, iff REGEXP is non-nil.  If
+called interactively, the value of REGEXP is determined by `ack-search-regexp'.
+A prefix arg toggles that value.
+DIRECTORY is the root directory.  If called interactively, it is determined by
+`ack-project-root-file-patterns'.  The user is only prompted, if
+`ack-prompt-for-directory' is set.
+
+\(fn PATTERN &optional REGEXP DIRECTORY)" t nil)
+
+(autoload 'ack-find-same-file "full-ack/full-ack" "\
+Prompt to find a file found by ack in DIRECTORY.
+
+\(fn &optional DIRECTORY)" t nil)
+
+(autoload 'ack-find-file "full-ack/full-ack" "\
+Prompt to find a file found by ack in DIRECTORY.
+
+\(fn &optional DIRECTORY)" t nil)
+
+;;;***
+
 ;;;### (autoloads (godoc gofmt-before-save gofmt go-mode) "go-mode/go-mode"
 ;;;;;;  "go-mode/go-mode.el" (20584 57668))
 ;;; Generated autoloads from go-mode/go-mode.el
@@ -243,25 +284,46 @@ option `scroll-bar-mode'.
 
 ;;;***
 
-;;;### (autoloads (smart-tabs-advice smart-tabs-mode-enable smart-tabs-mode)
-;;;;;;  "smarttabs/smart-tabs-mode" "smarttabs/smart-tabs-mode.el"
-;;;;;;  (20636 4852))
-;;; Generated autoloads from smarttabs/smart-tabs-mode.el
+;;;### (autoloads (global-rainbow-delimiters-mode rainbow-delimiters-mode-disable
+;;;;;;  rainbow-delimiters-mode-enable rainbow-delimiters-mode) "rainbow-delimiters/rainbow-delimiters"
+;;;;;;  "rainbow-delimiters/rainbow-delimiters.el" (20650 34921))
+;;; Generated autoloads from rainbow-delimiters/rainbow-delimiters.el
 
-(autoload 'smart-tabs-mode "smarttabs/smart-tabs-mode" "\
-Intelligently indent with tabs, align with spaces!
+(autoload 'rainbow-delimiters-mode "rainbow-delimiters/rainbow-delimiters" "\
+Highlight nested parentheses, brackets, and braces according to their depth.
 
 \(fn &optional ARG)" t nil)
 
-(autoload 'smart-tabs-mode-enable "smarttabs/smart-tabs-mode" "\
-Enable smart-tabs-mode.
+(autoload 'rainbow-delimiters-mode-enable "rainbow-delimiters/rainbow-delimiters" "\
+
 
 \(fn)" nil nil)
 
-(autoload 'smart-tabs-advice "smarttabs/smart-tabs-mode" "\
+(autoload 'rainbow-delimiters-mode-disable "rainbow-delimiters/rainbow-delimiters" "\
 
 
-\(fn FUNCTION OFFSET)" nil (quote macro))
+\(fn)" nil nil)
+
+(defvar global-rainbow-delimiters-mode nil "\
+Non-nil if Global-Rainbow-Delimiters mode is enabled.
+See the command `global-rainbow-delimiters-mode' for a description of this minor mode.
+Setting this variable directly does not take effect;
+either customize it (see the info node `Easy Customization')
+or call the function `global-rainbow-delimiters-mode'.")
+
+(custom-autoload 'global-rainbow-delimiters-mode "rainbow-delimiters/rainbow-delimiters" nil)
+
+(autoload 'global-rainbow-delimiters-mode "rainbow-delimiters/rainbow-delimiters" "\
+Toggle Rainbow-Delimiters mode in all buffers.
+With prefix ARG, enable Global-Rainbow-Delimiters mode if ARG is positive;
+otherwise, disable it.  If called from Lisp, enable the mode if
+ARG is omitted or nil.
+
+Rainbow-Delimiters mode is enabled in all buffers where
+`rainbow-delimiters-mode-enable' would do it.
+See `rainbow-delimiters-mode' for more information on Rainbow-Delimiters mode.
+
+\(fn &optional ARG)" t nil)
 
 ;;;***
 
@@ -434,6 +496,38 @@ Returns non-nil if the new state is enabled.
 
 ;;;***
 
+;;;### (autoloads (vline-global-mode vline-mode) "vline/vline" "vline/vline.el"
+;;;;;;  (20640 23418))
+;;; Generated autoloads from vline/vline.el
+
+(autoload 'vline-mode "vline/vline" "\
+Display vertical line mode.
+
+\(fn &optional ARG)" t nil)
+
+(defvar vline-global-mode nil "\
+Non-nil if Vline-Global mode is enabled.
+See the command `vline-global-mode' for a description of this minor mode.
+Setting this variable directly does not take effect;
+either customize it (see the info node `Easy Customization')
+or call the function `vline-global-mode'.")
+
+(custom-autoload 'vline-global-mode "vline/vline" nil)
+
+(autoload 'vline-global-mode "vline/vline" "\
+Toggle Vline mode in all buffers.
+With prefix ARG, enable Vline-Global mode if ARG is positive;
+otherwise, disable it.  If called from Lisp, enable the mode if
+ARG is omitted or nil.
+
+Vline mode is enabled in all buffers where
+`(lambda nil (unless (minibufferp) (vline-mode 1)))' would do it.
+See `vline-mode' for more information on Vline mode.
+
+\(fn &optional ARG)" t nil)
+
+;;;***
+
 ;;;### (autoloads (yaml-mode yaml) "yaml-mode/yaml-mode" "yaml-mode/yaml-mode.el"
 ;;;;;;  (20584 57676))
 ;;; Generated autoloads from yaml-mode/yaml-mode.el
@@ -459,8 +553,9 @@ Simple mode to edit YAML.
 ;;;;;;  "eproject/contrib/eproject-tags.el" "eproject/contrib/helm-eproject.el"
 ;;;;;;  "eproject/eproject-tests.el" "eproject/eproject.el" "eproject/lang/eproject-perl.el"
 ;;;;;;  "eproject/lang/eproject-ruby-on-rails.el" "eproject/lang/eproject-ruby.el"
-;;;;;;  "linum-off/linum-off.el" "sr-speedbar/sr-speedbar.el" "tabbar-ruler/tabbar-ruler.el")
-;;;;;;  (20636 5037 141727))
+;;;;;;  "linum-off/linum-off.el" "smooth-scroll/smooth-scroll.el"
+;;;;;;  "sr-speedbar/sr-speedbar.el" "tabbar-ruler/tabbar-ruler.el")
+;;;;;;  (20723 29450 590223))
 
 ;;;***
 

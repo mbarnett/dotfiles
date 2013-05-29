@@ -8,6 +8,13 @@
            (:name eproject :description "File grouping (\"project\") extension for emacs" :type github :pkgname "jrockway/eproject" :load-path
                   ("." "lang" "contrib")
                   :features eproject))
+ (full-ack status "installed" recipe
+           (:name full-ack :description "A front-end for ack" :type github :pkgname "nschum/full-ack" :prepare
+                  (progn
+                    (autoload 'ack "full-ack" nil t)
+                    (autoload 'ack-find-file "full-ack" nil t)
+                    (autoload 'ack-find-same-file "full-ack" nil t)
+                    (autoload 'ack-same "full-ack" nil t))))
  (go-mode status "installed" recipe
           (:name go-mode :description "Major mode for the Go programming language" :type http :url "http://go.googlecode.com/hg/misc/emacs/go-mode.el?r=tip" :localname "go-mode.el" :features go-mode :post-init
                  (add-to-list 'auto-mode-alist
@@ -17,15 +24,21 @@
             (:name linum-off :description "Provides an interface for turning line-numbering off" :type emacswiki :features linum-off))
  (nyan-mode status "installed" recipe
             (:name nyan-mode :description "Nyan Cat for Emacs! Nyanyanyanyanyanyanyanyanyan!" :type github :pkgname "TeMPOraL/nyan-mode" :features nyan-mode))
+ (paredit status "removed" recipe nil)
+ (rainbow-delimiters status "installed" recipe
+                     (:name rainbow-delimiters :website "https://github.com/jlr/rainbow-delimiters#readme" :description "Color nested parentheses, brackets, and braces according to their depth." :type github :pkgname "jlr/rainbow-delimiters" :features rainbow-delimiters))
  (smart-tab status "removed" recipe nil)
  (smarttabs status "removed" recipe nil)
+ (smooth-scroll status "installed" recipe
+                (:name smooth-scroll :description "Minor mode for smooth scrolling." :type emacswiki :features smooth-scroll))
  (sr-speedbar status "installed" recipe
               (:name sr-speedbar :type emacswiki :description "Same frame speedbar" :post-init
                      (require 'sr-speedbar)))
  (tabbar status "installed" recipe
          (:name tabbar :type emacswiki :description "Display a tab bar in the header line" :lazy t :load-path "."))
- (tabbar-ruler status "installed" recipe
-               (:name tabbar-ruler :website "https://github.com/mlf176f2/tabbar-ruler.el" :description "Tabbar ruler is an emacs package that allows both the tabbar and the ruler to be used together. In addition it allows auto-hiding of the menu-bar and tool-bar." :type github :depends tabbar :pkgname "mlf176f2/tabbar-ruler.el"))
+ (tabbar-ruler status "removed" recipe nil)
+ (vline status "installed" recipe
+        (:name vline :description "show vertical line (column highlighting) mode." :type emacswiki :features vline))
  (yaml-mode status "installed" recipe
             (:name yaml-mode :description "Simple major mode to edit YAML file for emacs" :type github :pkgname "yoshiki/yaml-mode" :prepare
                    (progn
