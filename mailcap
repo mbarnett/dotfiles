@@ -1,0 +1,6 @@
+application/PDF; /usr/bin/open -a /Applications/Preview.app %s
+application/*; /usr/bin/open %s
+audio/*; /usr/bin/open %s
+image/*; /usr/bin/open %s
+text/*; /usr/bin/open %s
+video/*; /usr/bin/open %s
