@@ -4,14 +4,28 @@
 
 (add-to-list 'load-path "~/.emacs.d/el-get/el-get")
 
-(unless (require 'el-get nil t)
-  (url-retrieve
-   "https://raw.github.com/dimitri/el-get/master/el-get-install.el"
-   (lambda (s)
-	 (goto-char (point-max))
-	 (eval-print-last-sexp))))
+(unless (require 'el-get nil 'noerror)
+  (with-current-buffer
+      (url-retrieve-synchronously
+       "https://raw.github.com/dimitri/el-get/master/el-get-install.el")
+    (let (el-get-master-branch)
+      (goto-char (point-max))
+      (eval-print-last-sexp))))
 
-(el-get 'sync)
+(setq my-el-get-packages
+      (append
+       '(el-get
+         nyan-mode
+         tabbar
+         eproject
+         rainbow-delimiters
+         direx
+         popwin
+         ace-jump-mode)
+
+       (mapcar 'el-get-source-name el-get-sources)))
+
+(el-get 'sync my-el-get-packages)
 
 
 ;;; Directories
@@ -43,7 +57,7 @@
   (not (eq window-system nil)))
 
 (defun is-mac-gui ()
-  (and 
+  (and
    (is-mac)
    (is-gui)))
 
@@ -73,7 +87,7 @@
 
 ; Like vi's O command
 (defun open-previous-line (arg)
-  "Open a new line before the current one. 
+  "Open a new line before the current one.
      See also `newline-and-indent'."
   (interactive "p")
   (beginning-of-line)
@@ -142,113 +156,22 @@
         (switch-to-buffer (find-slime-repl-buffer-name))
       (switch-to-buffer (other-buffer (current-buffer) 1)))))
 
-; override the pop-to-buffer with pop-to-buffer-same-window
-; when going to references in compilation buffers
-(defun compilation-goto-locus (msg mk end-mk)
-  "Jump to an error corresponding to MSG at MK.
-All arguments are markers.  If END-MK is non-nil, mark is set there
-and overlay is highlighted between MK and END-MK."
-  ;; Show compilation buffer in other window, scrolled to this error.
-  (let* ((from-compilation-buffer (eq (window-buffer (selected-window))
-                                      (marker-buffer msg)))
-         ;; Use an existing window if it is in a visible frame.
-         (pre-existing (get-buffer-window (marker-buffer msg) 0))
-         (w (if (and from-compilation-buffer pre-existing)
-                ;; Calling display-buffer here may end up (partly) hiding
-                ;; the error location if the two buffers are in two
-                ;; different frames.  So don't do it if it's not necessary.
-                pre-existing
-              (let ((display-buffer-reuse-frames t)
-                    (pop-up-windows t))
-		;; Pop up a window.
-                (display-buffer (marker-buffer msg)))))
-	 (highlight-regexp (with-current-buffer (marker-buffer msg)
-			     ;; also do this while we change buffer
-			     (compilation-set-window w msg)
-			     compilation-highlight-regexp)))
-    ;; Ideally, the window-size should be passed to `display-buffer'
-    ;; so it's only used when creating a new window.
-    (unless pre-existing (compilation-set-window-height w))
-
-    (if from-compilation-buffer
-        ;; If the compilation buffer window was selected,
-        ;; keep the compilation buffer in this window;
-        ;; display the source in another window.
-        (let ((pop-up-windows t))
-          (pop-to-buffer-same-window (marker-buffer mk) 'other-window))
-      (switch-to-buffer (marker-buffer mk)))
-    (unless (eq (goto-char mk) (point))
-      ;; If narrowing gets in the way of going to the right place, widen.
-      (widen)
-      (if next-error-move-function
-	  (funcall next-error-move-function msg mk)
-	(goto-char mk)))
-    (if end-mk
-        (push-mark end-mk t)
-      (if mark-active (setq mark-active)))
-    ;; If hideshow got in the way of
-    ;; seeing the right place, open permanently.
-    (dolist (ov (overlays-at (point)))
-      (when (eq 'hs (overlay-get ov 'invisible))
-        (delete-overlay ov)
-        (goto-char mk)))
-
-    (when highlight-regexp
-      (if (timerp next-error-highlight-timer)
-	  (cancel-timer next-error-highlight-timer))
-      (unless compilation-highlight-overlay
-	(setq compilation-highlight-overlay
-	      (make-overlay (point-min) (point-min)))
-	(overlay-put compilation-highlight-overlay 'face 'next-error))
-      (with-current-buffer (marker-buffer mk)
-	(save-excursion
-	  (if end-mk (goto-char end-mk) (end-of-line))
-	  (let ((end (point)))
-	    (if mk (goto-char mk) (beginning-of-line))
-	    (if (and (stringp highlight-regexp)
-		     (re-search-forward highlight-regexp end t))
-		(progn
-		  (goto-char (match-beginning 0))
-		  (move-overlay compilation-highlight-overlay
-				(match-beginning 0) (match-end 0)
-				(current-buffer)))
-	      (move-overlay compilation-highlight-overlay
-			    (point) end (current-buffer)))
-	    (if (or (eq next-error-highlight t)
-		    (numberp next-error-highlight))
-		;; We want highlighting: delete overlay on next input.
-		(add-hook 'pre-command-hook
-			  'compilation-goto-locus-delete-o)
-	      ;; We don't want highlighting: delete overlay now.
-	      (delete-overlay compilation-highlight-overlay))
-	    ;; We want highlighting for a limited time:
-	    ;; set up a timer to delete it.
-	    (when (numberp next-error-highlight)
-	      (setq next-error-highlight-timer
-		    (run-at-time next-error-highlight nil
-				 'compilation-goto-locus-delete-o)))))))
-    (when (and (eq next-error-highlight 'fringe-arrow))
-      ;; We want a fringe arrow (instead of highlighting).
-      (setq next-error-overlay-arrow-position
-	    (copy-marker (line-beginning-position))))))
-
-
 
 ;;; Settings
 
 
 ;; Niceties
 
-(setq backup-by-copying t)                  ; Don't clobber symlinks                   
-(setq version-control t)                    ; Keep multiple backups                    
-(setq delete-old-versions t)                ; Clean out old backups                    
-(setq kept-new-versions 5)                  ; Keep the 5 newest versions               
-(setq kept-old-versions 1)                  ; Don't keep the N oldest versions         
-(setq auto-save-default nil)                ; Only save when I say so                  
+(setq backup-by-copying t)                  ; Don't clobber symlinks
+(setq version-control t)                    ; Keep multiple backups
+(setq delete-old-versions t)                ; Clean out old backups
+(setq kept-new-versions 5)                  ; Keep the 5 newest versions
+(setq kept-old-versions 1)                  ; Don't keep the N oldest versions
+(setq auto-save-default nil)                ; Only save when I say so
 (setq inhibit-startup-message t)
-(setq vc-follow-symlinks nil)               ; Ditch the error, we ain't using RVS here 
-(setq split-height-threshold 0)
-(setq split-width-threshold nil)                 
+(setq vc-follow-symlinks nil)               ; Ditch the error, we ain't using RVS here
+;(setq split-height-threshold 0)
+;(setq split-width-threshold nil)
 (setq-default tab-width 4)                  ; Default tabs to 4 spaces
 (setq newline-and-indent t)                 ; Autoindent open-*-lines
 
@@ -292,20 +215,20 @@ and overlay is highlighted between MK and END-MK."
 
 ;; Key rebindings
 
-(global-set-key (kbd "C-w") 'back-kill-or-kill-region)  
-(global-set-key (kbd "M-/") 'comment-region)            
-(global-set-key (kbd "C-x C-b") 'switch-to-buffer)      
-(global-set-key (kbd "C-o") 'open-next-line)            
-(global-set-key (kbd "M-o") 'open-previous-line)        
+(global-set-key (kbd "C-w") 'back-kill-or-kill-region)
+(global-set-key (kbd "M-/") 'comment-region)
+(global-set-key (kbd "C-x C-b") 'switch-to-buffer)
+(global-set-key (kbd "C-o") 'open-next-line)
+(global-set-key (kbd "M-o") 'open-previous-line)
 (global-set-key (kbd "C-a") 'move-start-of-line-or-prev-line)
 (global-set-key (kbd "C-e") 'move-end-of-line-or-next-line)
-(global-set-key (kbd "C-;") 'smart-slime-repl-switch)   
+(global-set-key (kbd "C-;") 'smart-slime-repl-switch)
 (global-set-key (kbd "M-<RET>") 'cua-set-rectangle-mark)
 (global-set-key (kbd "C-j") 'ace-jump-word-mode)
-(global-set-key (kbd "C-f") 'forward-word)  
-(global-set-key (kbd "C-b") 'backward-word) 
-(global-set-key (kbd "M-f") 'forward-char)  
-(global-set-key (kbd "M-b") 'backward-char) 
+(global-set-key (kbd "C-f") 'forward-word)
+(global-set-key (kbd "C-b") 'backward-word)
+(global-set-key (kbd "M-f") 'forward-char)
+(global-set-key (kbd "M-b") 'backward-char)
 
 
 
@@ -359,6 +282,8 @@ and overlay is highlighted between MK and END-MK."
 
 ;; Tabbar
 
+(require 'tabbar)
+
 (setq tabbar-buffer-groups-function
       (lambda ()
         (list "All Buffers")))
@@ -368,10 +293,12 @@ and overlay is highlighted between MK and END-MK."
         (remove-if
          (lambda(buffer)
            (let ((bname (buffer-name buffer)))
-             (and 
-              (find  (aref bname 0) " *")
-              (not (member bname '("*scratch*" "*ack*")))
-              (not (string-prefix-p "*slime-repl" bname)))))
+             (or
+              (and
+               (find  (aref bname 0) " *")
+               (not (member bname '("*scratch*" "*ack*")))
+               (not (string-prefix-p "*slime-repl" bname)))
+              (eq (buffer-local-value 'major-mode buffer) 'direx:direx-mode))))
          (buffer-list))))
 
 (setq tabbar-cycle-scope (quote tabs))
@@ -391,19 +318,25 @@ and overlay is highlighted between MK and END-MK."
 (tabbar-mode t)
 
 
-;; Speedbar
-
-(setq speedbar-use-images nil)
-(setq sr-speedbar-right-side nil)
-(speedbar-add-supported-extension ".rb")
-(speedbar-add-supported-extension ".yml")
-(speedbar-add-supported-extension ".lisp")
-(speedbar-add-supported-extension ".asd")
-(setq sr-speedbar-auto-refresh nil)
-(global-set-key [f1] 'sr-speedbar-toggle)
-
-
 ;; Smart Tab dynamic completions
+
+;; Direx
+
+(add-hook 'direx-load-hook (lambda ()
+            (tabbar-local-mode -1)))
+
+
+;; popwin
+
+(require 'popwin)
+
+(push '(direx:direx-mode :position left :width 25 :dedicated t :stick t)
+      popwin:special-display-config)
+(global-set-key (kbd "<f5>") 'direx:jump-to-directory-other-window)
+(popwin-mode 1)
+
+(defun direx:find-item (&optional item)
+  (direx:find-item-other-window item))
 
 (require 'smart-tab)
 (global-smart-tab-mode 1)
@@ -452,7 +385,8 @@ and overlay is highlighted between MK and END-MK."
             (set (make-local-variable 'tab-width) 2)
             (local-set-key (kbd "C-l") 'insert-hashrocket)
             (local-set-key (kbd "RET") 'reindent-then-newline-and-indent)
-            (local-set-key (kbd "C-j") 'ace-jump-word-mode)))
+;            (local-set-key (kbd "C-j") 'ace-jump-word-mode)))
+))
 
 
 ;; Lisp stuff
@@ -468,15 +402,15 @@ and overlay is highlighted between MK and END-MK."
         (cmucl ("/usr/local/bin/lisp"))
         (clisp ("/usr/local/bin/clisp"))))
 
-(load (expand-file-name "~/.quicklisp/slime-helper.el"))
-(setq slime-net-coding-system 'utf-8-unix) ; utf-8 support for clozure 
-(slime-setup '(slime-fancy slime-banner))
+;(load (expand-file-name "~/.quicklisp/slime-helper.el"))
+(setq slime-net-coding-system 'utf-8-unix) ; utf-8 support for clozure
+;(slime-setup '(slime-fancy slime-font))
 
-(font-lock-add-keywords
- 'lisp-mode
- '(("[[:space:](]\\([0-9]+\\)[[:space:])]" 1 font-lock-constant-face)
-   ("[[:space:](]\\(nil\\)[[:space:])]" 1 font-lock-constant-face)
-   ("[[:space:](]\\(t\\)[[:space:])]" 1 font-lock-constant-face)))
+;; (banner-lock-add-keywords
+;;  'lisp-mode
+;;  '(("[[:space:](]\\([0-9]+\\)[[:space:])]" 1 font-lock-constant-face)
+;;    ("[[:space:](]\\(nil\\)[[:space:])]" 1 font-lock-constant-face)
+;;    ("[[:space:](]\\(t\\)[[:space:])]" 1 font-lock-constant-face)))
 
 
 
@@ -508,6 +442,7 @@ and overlay is highlighted between MK and END-MK."
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+'(nyan-animate-nyancat t)
  '(custom-safe-themes (quote ("fc5fcb6f1f1c1bc01305694c59a1a861b008c534cae8d0e48e4d5e81ad718bc6" "1e7e097ec8cb1f8c3a912d7e1e0331caeed49fef6cff220be63bd2a6ba4cc365" default))))
 (custom-set-faces
  '(tabbar-default ((t (:inherit variable-pitch :background "brightyellow" :foreground "black" :weight bold))))
