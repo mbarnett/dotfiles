@@ -6,7 +6,7 @@
   name = Matt Barnett
   email = matt@sixtyodd.com
 [core]
-  editor = emacs
+  editor = mg
   excludesfile = /Users/matt/.gitignore
 [alias]
   undo-all = reset --hard
