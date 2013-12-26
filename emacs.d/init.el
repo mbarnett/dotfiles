@@ -14,18 +14,29 @@
 
 (setq my-el-get-packages
       (append
-       '(el-get
-         nyan-mode
-         tabbar
-         eproject
-         rainbow-delimiters
+       '(ace-jump-mode
+         ack-and-a-half
+         auto-complete
+         cider
+         dash-at-point
          direx
+         el-get
+         exec-path-from-shell
+         grizzl
+         magit
+         nyan-mode
+         pbcopy
          popwin
-         ace-jump-mode)
-
+         projectile
+         rainbow-delimiters
+         rainbow-mode
+         switch-window
+         tabbar
+         web-mode)
        (mapcar 'el-get-source-name el-get-sources)))
 
 (el-get 'sync my-el-get-packages)
+
 
 
 ;;; Directories
@@ -159,6 +170,33 @@
 
 ;;; Settings
 
+;; Mac & GUI specific stuff
+
+(if (is-gui)
+    (progn
+      (scroll-bar-mode -1)
+      (tool-bar-mode -1)))
+
+(if (not (is-gui))
+    (menu-bar-mode -1))
+
+(if (is-mac)
+    (progn
+      (setq browse-url-browser-function 'rcy-browse-url-default-macosx-browser)
+      (setq mac-option-key-is-meta nil)
+      (setq mac-command-key-is-meta t)
+      (setq mac-command-modifier 'meta)
+      (setq mac-option-modifier nil)
+      (turn-on-pbcopy)))
+
+(if (is-mac-gui)
+    (progn
+      (ns-set-resource nil "ApplePressAndHoldEnabled" "NO")
+      (setq ns-pop-up-frames nil)
+      (set-fringe-mode 0)
+      ;; Read in Mac env variables when launched via GUI
+      (exec-path-from-shell-initialize)))
+
 
 ;; Niceties
 
@@ -170,8 +208,7 @@
 (setq auto-save-default nil)                ; Only save when I say so
 (setq inhibit-startup-message t)
 (setq vc-follow-symlinks nil)               ; Ditch the error, we ain't using RVS here
-;(setq split-height-threshold 0)
-;(setq split-width-threshold nil)
+(setq-default indent-tabs-mode nil)
 (setq-default tab-width 4)                  ; Default tabs to 4 spaces
 (setq newline-and-indent t)                 ; Autoindent open-*-lines
 
@@ -194,9 +231,12 @@
 
 (set-default 'cursor-type 'bar)
 
-
 (add-to-list 'same-window-buffer-names "*inferior-lisp*")
 (add-to-list 'same-window-buffer-names "*ack*")
+
+; nuke trailing whitespace on save
+(add-hook 'before-save-hook 'delete-trailing-whitespace)
+
 
 ;;; Interface
 
@@ -229,32 +269,6 @@
 (global-set-key (kbd "C-b") 'backward-word)
 (global-set-key (kbd "M-f") 'forward-char)
 (global-set-key (kbd "M-b") 'backward-char)
-
-
-
-;; Mac & GUI specific stuff
-
-(if (is-gui)
-    (progn
-      (scroll-bar-mode -1)
-      (tool-bar-mode -1)))
-
-(if (not (is-gui))
-    (menu-bar-mode -1))
-
-(if (is-mac)
-    (progn
-      (setq browse-url-browser-function 'rcy-browse-url-default-macosx-browser)
-      (setq mac-option-key-is-meta nil)
-      (setq mac-command-key-is-meta t)
-      (setq mac-command-modifier 'meta)
-      (setq mac-option-modifier nil)))
-
-(if (is-mac-gui)
-    (progn
-      (ns-set-resource nil "ApplePressAndHoldEnabled" "NO")
-      (setq ns-pop-up-frames nil)
-      (set-fringe-mode 0)))
 
 
 ;; Line numbers
@@ -314,16 +328,23 @@
 (global-set-key [C-left] 'tabbar-backward)
 (global-set-key [C-right] 'tabbar-forward)
 
-
 (tabbar-mode t)
 
 
 ;; Smart Tab dynamic completions
 
-;; Direx
+;(require 'smart-tab)
+;(global-smart-tab-mode 1)
 
-(add-hook 'direx-load-hook (lambda ()
-            (tabbar-local-mode -1)))
+;; Autocomplete
+
+(require 'auto-complete-config)
+ (add-to-list 'ac-dictionary-directories
+     "~/.emacs.d/.cask/24.3.50.1/elpa/auto-complete-20130724.1750/dict")
+ (ac-config-default)
+ (setq ac-ignore-case nil)
+ (add-to-list 'ac-modes 'ruby-mode)
+ (add-to-list 'ac-modes 'web-mode)
 
 
 ;; popwin
@@ -332,27 +353,48 @@
 
 (push '(direx:direx-mode :position left :width 25 :dedicated t :stick t)
       popwin:special-display-config)
-(global-set-key (kbd "<f5>") 'direx:jump-to-directory-other-window)
+
+(push '("magit" :position bottom :height 25 :dedicated t :stick f :regexp t)
+      popwin:special-display-config)
+
+(push '(ack-and-a-half-mode :position bottom :height 20 :dedicated t :stick f)
+      popwin:special-display-config)
+
 (popwin-mode 1)
 
+
+;; Projectile
+
+(setq projectile-indexing-method 'alien)
+(setq projectile-completion-system 'grizzl)
+(projectile-global-mode)
+
+(define-key projectile-mode-map (kbd "M-p")
+    'projectile-find-file)
+
+(define-key projectile-mode-map [(meta shift f)]
+  'projectile-ack)
+
+(define-key projectile-mode-map [(meta shift r)]
+  'projectile-replace)
+
+
+;; Direx
+
+(define-key projectile-mode-map (kbd "C-c C-c")
+  (lambda ()
+    (interactive)
+    (direx:find-directory-other-window (projectile-project-root))))
+
+; Direx hard codes use of find-item internally when selecting files with RET
+; I'd much rather it always use find-item-other-window, so let's override it
 (defun direx:find-item (&optional item)
   (direx:find-item-other-window item))
-
-(require 'smart-tab)
-(global-smart-tab-mode 1)
 
 
 ;; hl-line
 
 (global-hl-line-mode 1)
-
-
-;; pbcopy for OS X
-
-(if (is-mac)
-    (progn
-      (require 'pbcopy)
-      (turn-on-pbcopy)))
 
 
 ;;; Development
@@ -381,12 +423,9 @@
 
 (add-hook 'ruby-mode-hook
           (lambda ()
-            (set (make-local-variable 'indent-tabs-mode) 't)
             (set (make-local-variable 'tab-width) 2)
             (local-set-key (kbd "C-l") 'insert-hashrocket)
-            (local-set-key (kbd "RET") 'reindent-then-newline-and-indent)
-;            (local-set-key (kbd "C-j") 'ace-jump-word-mode)))
-))
+            (local-set-key (kbd "RET") 'reindent-then-newline-and-indent)))
 
 
 ;; Lisp stuff
@@ -402,15 +441,15 @@
         (cmucl ("/usr/local/bin/lisp"))
         (clisp ("/usr/local/bin/clisp"))))
 
-;(load (expand-file-name "~/.quicklisp/slime-helper.el"))
+(load (expand-file-name "~/.quicklisp/slime-helper.el"))
 (setq slime-net-coding-system 'utf-8-unix) ; utf-8 support for clozure
-;(slime-setup '(slime-fancy slime-font))
+(slime-setup '(slime-fancy slime-banner))
 
-;; (banner-lock-add-keywords
-;;  'lisp-mode
-;;  '(("[[:space:](]\\([0-9]+\\)[[:space:])]" 1 font-lock-constant-face)
-;;    ("[[:space:](]\\(nil\\)[[:space:])]" 1 font-lock-constant-face)
-;;    ("[[:space:](]\\(t\\)[[:space:])]" 1 font-lock-constant-face)))
+(font-lock-add-keywords
+ 'lisp-mode
+ '(("[[:space:](]\\([0-9]+\\)[[:space:])]" 1 font-lock-constant-face)
+   ("[[:space:](]\\(nil\\)[[:space:])]" 1 font-lock-constant-face)
+   ("[[:space:](]\\(t\\)[[:space:])]" 1 font-lock-constant-face)))
 
 
 
@@ -424,25 +463,12 @@
 (setq auto-mode-alist (cons '("\\.mm$" . objc-mode) auto-mode-alist))
 
 
-
-;; peepopen
-
-(require 'eproject-peepopen)
-
-
-;; Ack
-
-(setq ack-executable "/usr/local/bin/ack")
-(global-set-key [(meta shift f)] 'ack)
-
-
-
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
-'(nyan-animate-nyancat t)
+ '(nyan-animate-nyancat t)
  '(custom-safe-themes (quote ("fc5fcb6f1f1c1bc01305694c59a1a861b008c534cae8d0e48e4d5e81ad718bc6" "1e7e097ec8cb1f8c3a912d7e1e0331caeed49fef6cff220be63bd2a6ba4cc365" default))))
 (custom-set-faces
  '(tabbar-default ((t (:inherit variable-pitch :background "brightyellow" :foreground "black" :weight bold))))

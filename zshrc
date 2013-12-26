@@ -4,6 +4,8 @@ SAVEHIST=10000
 unsetopt beep
 setopt SH_WORD_SPLIT
 
+
+
 case $TERM in
     screen*)
         ;; # tmux's TERM is set in .tmux.conf
@@ -16,6 +18,7 @@ esac
 bindkey -e
 
 autoload -Uz compinit && compinit
+compdef -d git
 
 autoload -U select-word-style
 select-word-style bash
@@ -24,7 +27,7 @@ autoload -U colors && colors
 
 alias ls='ls -hG'
 alias vim='/Applications/MacVim/mvim'
-alias emacs='/Applications/Emacs.app/Contents/MacOS/Emacs -nw'
+alias emacs='/Applications/Emacs.app/Contents/MacOS/Emacs'
 alias tmux='tmux -2'
 alias pine='alpine'
 
@@ -73,5 +76,4 @@ function chpwd() {
     set_gopath_if_goproj
 }
 
-
-[[ -s "/Users/matt/.rvm/scripts/rvm" ]] && source "/Users/matt/.rvm/scripts/rvm" # Load RVM into a shell session *as a function*
+eval "$(rbenv init -)"
