@@ -4,6 +4,8 @@ SAVEHIST=10000
 unsetopt beep
 setopt SH_WORD_SPLIT
 
+
+
 case $TERM in
     screen*)
         ;; # tmux's TERM is set in .tmux.conf
@@ -75,3 +77,4 @@ function chpwd() {
     set_gopath_if_goproj
 }
 
+eval "$(rbenv init -)"
