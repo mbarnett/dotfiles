@@ -16,6 +16,7 @@ esac
 bindkey -e
 
 autoload -Uz compinit && compinit
+compdef -d git
 
 autoload -U select-word-style
 select-word-style bash
@@ -24,16 +25,17 @@ autoload -U colors && colors
 
 alias ls='ls -hG'
 alias vim='/Applications/MacVim/mvim'
-alias emacs='/Applications/Emacs.app/Contents/MacOS/Emacs -nw'
+alias emacs='/Applications/Emacs.app/Contents/MacOS/Emacs'
 alias tmux='tmux -2'
 alias pine='alpine'
+alias subl='/Applications/Sublime\ Text\ 2.app/Contents/SharedSupport/bin/subl'
 
-export PATH=/usr/local/bin:/usr/local/sbin:$PATH:$HOME/.gitscripts:$HOME/.cabal/bin:$HOME/bin
+export PATH=~/.rbenv/shims:/usr/local/bin:/usr/local/sbin:$PATH:$HOME/.gitscripts:$HOME/.cabal/bin:$HOME/bin
 
 export CLICOLOR=1
 export LSCOLORS=ExFxCxDxBxegedabagacad
 
-export EDITOR='emacs'
+export EDITOR='mg'
 
 # Node.js
 export NODE_PATH=/usr/local/lib/node
@@ -73,5 +75,3 @@ function chpwd() {
     set_gopath_if_goproj
 }
 
-
-[[ -s "/Users/matt/.rvm/scripts/rvm" ]] && source "/Users/matt/.rvm/scripts/rvm" # Load RVM into a shell session *as a function*

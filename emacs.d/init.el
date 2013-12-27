@@ -21,7 +21,8 @@
          rainbow-delimiters
          direx
          popwin
-         ace-jump-mode)
+         ace-jump-mode
+         markdown-mode)
 
        (mapcar 'el-get-source-name el-get-sources)))
 
@@ -94,7 +95,6 @@
   (open-line arg)
   (when newline-and-indent
     (indent-according-to-mode)))
-
 
 (defun back-kill-or-kill-region (arg)
   "Kill the region if active, else backwards kill a word"
@@ -170,8 +170,6 @@
 (setq auto-save-default nil)                ; Only save when I say so
 (setq inhibit-startup-message t)
 (setq vc-follow-symlinks nil)               ; Ditch the error, we ain't using RVS here
-;(setq split-height-threshold 0)
-;(setq split-width-threshold nil)
 (setq-default tab-width 4)                  ; Default tabs to 4 spaces
 (setq newline-and-indent t)                 ; Autoindent open-*-lines
 
@@ -318,12 +316,15 @@
 (tabbar-mode t)
 
 
-;; Smart Tab dynamic completions
-
 ;; Direx
+(defun direx:find-item (&optional item)
+  (direx:find-item-other-window item))
 
-(add-hook 'direx-load-hook (lambda ()
-            (tabbar-local-mode -1)))
+(global-set-key (kbd "<f5>") 'direx:jump-to-directory-other-window)
+
+;(add-hook 'eproject-first-buffer-hook 
+;          (lambda ()
+ ;           (direx:find-directory-reuse-other-window (eproject-root))))
 
 
 ;; popwin
@@ -332,11 +333,11 @@
 
 (push '(direx:direx-mode :position left :width 25 :dedicated t :stick t)
       popwin:special-display-config)
-(global-set-key (kbd "<f5>") 'direx:jump-to-directory-other-window)
+
 (popwin-mode 1)
 
-(defun direx:find-item (&optional item)
-  (direx:find-item-other-window item))
+
+;; Smart Tab dynamic completions
 
 (require 'smart-tab)
 (global-smart-tab-mode 1)
@@ -376,6 +377,9 @@
 
 (add-to-list 'auto-mode-alist '("\\.yml$" . yaml-mode))
 (add-to-list 'auto-mode-alist '("\\.rake$" . ruby-mode))
+(add-to-list 'auto-mode-alist '("\\Rakefile$" . ruby-mode))
+(add-to-list 'auto-mode-alist '("\\Vagrantfile$" . ruby-mode))
+(add-to-list 'auto-mode-alist '("\\Gemfile$" . ruby-mode))
 
 (setq ruby-deep-indent-paren nil)
 
@@ -385,8 +389,7 @@
             (set (make-local-variable 'tab-width) 2)
             (local-set-key (kbd "C-l") 'insert-hashrocket)
             (local-set-key (kbd "RET") 'reindent-then-newline-and-indent)
-;            (local-set-key (kbd "C-j") 'ace-jump-word-mode)))
-))
+            (local-set-key (kbd "C-j") 'ace-jump-word-mode)))
 
 
 ;; Lisp stuff
@@ -402,15 +405,15 @@
         (cmucl ("/usr/local/bin/lisp"))
         (clisp ("/usr/local/bin/clisp"))))
 
-;(load (expand-file-name "~/.quicklisp/slime-helper.el"))
+(load (expand-file-name "~/.quicklisp/slime-helper.el"))
 (setq slime-net-coding-system 'utf-8-unix) ; utf-8 support for clozure
-;(slime-setup '(slime-fancy slime-font))
+(slime-setup '(slime-fancy slime-font))
 
-;; (banner-lock-add-keywords
-;;  'lisp-mode
-;;  '(("[[:space:](]\\([0-9]+\\)[[:space:])]" 1 font-lock-constant-face)
-;;    ("[[:space:](]\\(nil\\)[[:space:])]" 1 font-lock-constant-face)
-;;    ("[[:space:](]\\(t\\)[[:space:])]" 1 font-lock-constant-face)))
+(font-lock-add-keywords
+ 'lisp-mode
+ '(("[[:space:](]\\([0-9]+\\)[[:space:])]" 1 font-lock-constant-face)
+   ("[[:space:](]\\(nil\\)[[:space:])]" 1 font-lock-constant-face)
+   ("[[:space:](]\\(t\\)[[:space:])]" 1 font-lock-constant-face)))
 
 
 
