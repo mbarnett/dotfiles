@@ -30,13 +30,14 @@ alias vim='/Applications/MacVim/mvim'
 alias emacs='/Applications/Emacs.app/Contents/MacOS/Emacs'
 alias tmux='tmux -2'
 alias pine='alpine'
+alias subl='/Applications/Sublime\ Text\ 2.app/Contents/SharedSupport/bin/subl'
 
-export PATH=/usr/local/bin:/usr/local/sbin:$PATH:$HOME/.gitscripts:$HOME/.cabal/bin:$HOME/bin
+export PATH=~/.rbenv/shims:/usr/local/bin:/usr/local/sbin:$PATH:$HOME/.gitscripts:$HOME/.cabal/bin:$HOME/bin
 
 export CLICOLOR=1
 export LSCOLORS=ExFxCxDxBxegedabagacad
 
-export EDITOR='emacs'
+export EDITOR='mg'
 
 # Node.js
 export NODE_PATH=/usr/local/lib/node

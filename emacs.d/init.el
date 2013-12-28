@@ -24,6 +24,7 @@
          exec-path-from-shell
          grizzl
          magit
+         markdown-mode
          nyan-mode
          pbcopy
          popwin
@@ -105,7 +106,6 @@
   (open-line arg)
   (when newline-and-indent
     (indent-according-to-mode)))
-
 
 (defun back-kill-or-kill-region (arg)
   "Kill the region if active, else backwards kill a word"
@@ -423,6 +423,9 @@
 
 (add-to-list 'auto-mode-alist '("\\.yml$" . yaml-mode))
 (add-to-list 'auto-mode-alist '("\\.rake$" . ruby-mode))
+(add-to-list 'auto-mode-alist '("\\Rakefile$" . ruby-mode))
+(add-to-list 'auto-mode-alist '("\\Vagrantfile$" . ruby-mode))
+(add-to-list 'auto-mode-alist '("\\Gemfile$" . ruby-mode))
 
 (setq ruby-deep-indent-paren nil)
 
