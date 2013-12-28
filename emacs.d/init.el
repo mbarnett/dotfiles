@@ -271,12 +271,17 @@
 (global-set-key (kbd "M-b") 'backward-char)
 
 
+;; Window navigation
+
+(windmove-default-keybindings)
+(setq windmove-wrap-around t)
+
 ;; Line numbers
 
 (setq linum-format " %d ")
 
 ; for linum-off
-(setq linum-disabled-modes-list '(eshell-mode wl-summary-mode compilation-mode dired-mode speedbar-mode))
+(setq linum-disabled-modes-list '(eshell-mode wl-summary-mode compilation-mode dired-mode speedbar-mode direx:direx-mode))
 
 (global-linum-mode 1)
 
