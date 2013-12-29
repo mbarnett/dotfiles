@@ -224,7 +224,7 @@
 (transient-mark-mode 1)                     ; I prefer transient mark mode
 (cua-selection-mode t)                      ; CUA for regions only
 (desktop-save-mode 1)
-(global-auto-revert-mode t)
+(global-auto-revert-mode 1)
 (setq mouse-wheel-progressive-speed nil)
 (setq ring-bell-function 'ignore)
 
