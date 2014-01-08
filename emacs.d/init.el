@@ -33,6 +33,7 @@
          rainbow-mode
          switch-window
          tabbar
+         wanderlust
          web-mode)
        (mapcar 'el-get-source-name el-get-sources)))
 
@@ -42,12 +43,12 @@
 
 ;;; Directories
 
-(setq config-dir (expand-file-name "~/.emacs.d/"))
-(setq backup-dir (concat config-dir "backups"))
-(setq local-pkg-dir (concat config-dir "local-elisp"))
-(setq theme-dir (concat config-dir "themes/"))
-(setq solarized-dir (concat theme-dir "emacs-color-theme-solarized"))
-(setq w3m-dir (concat config-dir "w3m"))
+(setq config-dir (expand-file-name "~/.emacs.d/")
+      backup-dir (concat config-dir "backups")
+      local-pkg-dir (concat config-dir "local-elisp")
+      theme-dir (concat config-dir "themes/")
+      solarized-dir (concat theme-dir "emacs-color-theme-solarized")
+      w3m-dir (concat config-dir "w3m"))
 
 
 
@@ -116,7 +117,7 @@
 
 
 ; For launching the default browser on os x
-(defun rcy-browse-url-default-macosx-browser (url &optional new-window)
+(defun browse-url-default-macosx-browser (url &optional new-window)
   (interactive (browse-url-interactive-arg "URL: "))
   (let ((url
 	 (if (aref (url-generic-parse-url url) 0)
@@ -154,8 +155,8 @@
       (if (string-match "^\*slime-repl.*\*$" candidate)
           (setq buffers nil)
         (progn
-          (setq candidate nil)
-          (setq buffers (cdr buffers)))))
+          (setq candidate nil
+                buffers (cdr buffers)))))
     candidate))
 
 (defun smart-slime-repl-switch ()
@@ -166,6 +167,97 @@
     (if (and slime-repl-buffer (not (string= slime-repl-buffer current-buffer-name)))
         (switch-to-buffer (find-slime-repl-buffer-name))
       (switch-to-buffer (other-buffer (current-buffer) 1)))))
+
+
+; override the pop-to-buffer with pop-to-buffer-same-window
+; when going to references in compilation buffers
+(defun compilation-goto-locus (msg mk end-mk)
+  "Jump to an error corresponding to MSG at MK.
+All arguments are markers.  If END-MK is non-nil, mark is set there
+and overlay is highlighted between MK and END-MK."
+  ;; Show compilation buffer in other window, scrolled to this error.
+  (let* ((from-compilation-buffer (eq (window-buffer (selected-window))
+                                      (marker-buffer msg)))
+         ;; Use an existing window if it is in a visible frame.
+         (pre-existing (get-buffer-window (marker-buffer msg) 0))
+         (w (if (and from-compilation-buffer pre-existing)
+                ;; Calling display-buffer here may end up (partly) hiding
+                ;; the error location if the two buffers are in two
+                ;; different frames.  So don't do it if it's not necessary.
+                pre-existing
+              (let ((display-buffer-reuse-frames t)
+                    (pop-up-windows t))
+                ;; Pop up a window.
+                (display-buffer (marker-buffer msg)))))
+         (highlight-regexp (with-current-buffer (marker-buffer msg)
+                             ;; also do this while we change buffer
+                             (compilation-set-window w msg)
+                             compilation-highlight-regexp)))
+    ;; Ideally, the window-size should be passed to `display-buffer'
+    ;; so it's only used when creating a new window.
+    (unless pre-existing (compilation-set-window-height w))
+
+    (if from-compilation-buffer
+        ;; If the compilation buffer window was selected,
+        ;; keep the compilation buffer in this window;
+        ;; display the source in another window.
+        (let ((pop-up-windows t))
+          (pop-to-buffer-same-window (marker-buffer mk) 'other-window))
+      (switch-to-buffer (marker-buffer mk)))
+    (unless (eq (goto-char mk) (point))
+      ;; If narrowing gets in the way of going to the right place, widen.
+      (widen)
+      (if next-error-move-function
+          (funcall next-error-move-function msg mk)
+        (goto-char mk)))
+    (if end-mk
+        (push-mark end-mk t)
+      (if mark-active (setq mark-active)))
+    ;; If hideshow got in the way of
+    ;; seeing the right place, open permanently.
+    (dolist (ov (overlays-at (point)))
+      (when (eq 'hs (overlay-get ov 'invisible))
+        (delete-overlay ov)
+        (goto-char mk)))
+
+    (when highlight-regexp
+      (if (timerp next-error-highlight-timer)
+          (cancel-timer next-error-highlight-timer))
+      (unless compilation-highlight-overlay
+        (setq compilation-highlight-overlay
+              (make-overlay (point-min) (point-min)))
+        (overlay-put compilation-highlight-overlay 'face 'next-error))
+      (with-current-buffer (marker-buffer mk)
+        (save-excursion
+          (if end-mk (goto-char end-mk) (end-of-line))
+          (let ((end (point)))
+            (if mk (goto-char mk) (beginning-of-line))
+            (if (and (stringp highlight-regexp)
+                     (re-search-forward highlight-regexp end t))
+                (progn
+                  (goto-char (match-beginning 0))
+                  (move-overlay compilation-highlight-overlay
+                                (match-beginning 0) (match-end 0)
+                                (current-buffer)))
+              (move-overlay compilation-highlight-overlay
+                            (point) end (current-buffer)))
+            (if (or (eq next-error-highlight t)
+                    (numberp next-error-highlight))
+                ;; We want highlighting: delete overlay on next input.
+                (add-hook 'pre-command-hook
+                          'compilation-goto-locus-delete-o)
+              ;; We don't want highlighting: delete overlay now.
+              (delete-overlay compilation-highlight-overlay))
+            ;; We want highlighting for a limited time:
+            ;; set up a timer to delete it.
+            (when (numberp next-error-highlight)
+              (setq next-error-highlight-timer
+                    (run-at-time next-error-highlight nil
+                                 'compilation-goto-locus-delete-o)))))))
+    (when (and (eq next-error-highlight 'fringe-arrow))
+      ;; We want a fringe arrow (instead of highlighting).
+      (setq next-error-overlay-arrow-position
+            (copy-marker (line-beginning-position))))))
 
 
 ;;; Settings
@@ -182,12 +274,12 @@
 
 (if (is-mac)
     (progn
-      (setq browse-url-browser-function 'rcy-browse-url-default-macosx-browser)
-      (setq mac-option-key-is-meta nil)
-      (setq mac-command-key-is-meta t)
-      (setq mac-command-modifier 'meta)
-      (setq mac-option-modifier nil)
-      (turn-on-pbcopy)))
+      (setq browse-url-browser-function 'browse-url-default-macosx-browser
+            mac-option-key-is-meta nil
+            mac-command-key-is-meta t
+            mac-command-modifier 'meta
+            mac-option-modifier nil
+            turn-on-pbcopy)))
 
 (if (is-mac-gui)
     (progn
@@ -200,33 +292,40 @@
 
 ;; Niceties
 
-(setq backup-by-copying t)                  ; Don't clobber symlinks
-(setq version-control t)                    ; Keep multiple backups
-(setq delete-old-versions t)                ; Clean out old backups
-(setq kept-new-versions 5)                  ; Keep the 5 newest versions
-(setq kept-old-versions 1)                  ; Don't keep the N oldest versions
-(setq auto-save-default nil)                ; Only save when I say so
-(setq inhibit-startup-message t)
-(setq vc-follow-symlinks nil)               ; Ditch the error, we ain't using RVS here
-(setq-default indent-tabs-mode nil)
-(setq-default tab-width 4)                  ; Default tabs to 4 spaces
-(setq newline-and-indent t)                 ; Autoindent open-*-lines
+(setq backup-by-copying t
+      version-control t
+      delete-old-versions t
+      kept-new-versions 5
+      kept-old-versions 1
+      auto-save-default nil
+      inhibit-startup-message t
+      vc-follow-symlinks nil
+      newline-and-indent t
+      mouse-wheel-progressive-speed nil
+      ring-bell-function 'ignore
+      show-paren-style 'expression)
 
+(setq-default indent-tabs-mode nil)
+(setq-default tab-width 4)
+ ;; This causes the current time in the mode line to be displayed in
+ ;; `egoge-display-time-face' to make it stand out visually.
+(setq display-time-string-forms
+      '((propertize (concat " " 12-hours ":" minutes am-pm)
+ 		    'face 'egoge-display-time)))
 
 (fset 'yes-or-no-p 'y-or-n-p)               ; Those long-form questions are annoying
 
 (global-font-lock-mode 1)                   ; Syntax highlighting
 (delete-selection-mode t)                   ; Overwrite selections when you type
 (show-paren-mode t)
-(setq show-paren-style 'expression)
+;(type-break-mode 1)
+;(type-break-query-mode 1)
 (column-number-mode t)                      ; Show column number in modeline
 (set-backup-dir backup-dir)                 ; Keep the filesystem tidy
-(transient-mark-mode 1)                     ; I prefer transient mark mode
+(transient-mark-mode 1)
 (cua-selection-mode t)                      ; CUA for regions only
 (desktop-save-mode 1)
 (global-auto-revert-mode 1)
-(setq mouse-wheel-progressive-speed nil)
-(setq ring-bell-function 'ignore)
 
 
 (set-default 'cursor-type 'bar)
@@ -317,6 +416,7 @@
                (find  (aref bname 0) " *")
                (not (member bname '("*scratch*" "*ack*")))
                (not (string-prefix-p "*slime-repl" bname)))
+;              (equal (bname ".type-break"))
               (eq (buffer-local-value 'major-mode buffer) 'direx:direx-mode))))
          (buffer-list))))
 
@@ -335,11 +435,6 @@
 
 (tabbar-mode t)
 
-
-;; Smart Tab dynamic completions
-
-;(require 'smart-tab)
-;(global-smart-tab-mode 1)
 
 ;; Autocomplete
 
@@ -364,6 +459,8 @@
 
 (push '(ack-and-a-half-mode :position bottom :height 20 :dedicated t :stick f)
       popwin:special-display-config)
+
+;(push
 
 (popwin-mode 1)
 
@@ -476,11 +573,16 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(custom-safe-themes (quote ("fc5fcb6f1f1c1bc01305694c59a1a861b008c534cae8d0e48e4d5e81ad718bc6" "1e7e097ec8cb1f8c3a912d7e1e0331caeed49fef6cff220be63bd2a6ba4cc365" default)))
  '(nyan-animate-nyancat t)
- '(custom-safe-themes (quote ("fc5fcb6f1f1c1bc01305694c59a1a861b008c534cae8d0e48e4d5e81ad718bc6" "1e7e097ec8cb1f8c3a912d7e1e0331caeed49fef6cff220be63bd2a6ba4cc365" default))))
+ '(safe-local-variable-values (quote ((encoding . utf-8)))))
 (custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(col-highlight ((t (:background "black"))))
+ '(font-lock-constant-face ((t (:foreground "#af005f"))))
  '(tabbar-default ((t (:inherit variable-pitch :background "brightyellow" :foreground "black" :weight bold))))
  '(tabbar-selected ((t (:inherit tabbar-default :foreground "grey" :background "black"))))
- '(tabbar-unselected ((t (:background "black" :inherit variable-pitch))))
- '(col-highlight ((t (:background "black"))))
- '(font-lock-constant-face ((t (:foreground "#af005f")))))
+ '(tabbar-unselected ((t (:background "black" :inherit variable-pitch)))))
