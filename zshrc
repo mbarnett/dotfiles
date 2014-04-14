@@ -60,7 +60,7 @@ function set_gopath_if_goproj() {
     done
 }
 
-function parse_git_branch() {
+function parse_curr_git_branch_name() {
   ref=$(git symbolic-ref HEAD 2> /dev/null) || return
   echo " ("${ref#refs/heads/}")"
 }
@@ -70,7 +70,7 @@ RED="%{$fg[magenta]%}"
 RESET="%{$reset_color%}"
 
 function precmd() {
-    PROMPT="$BOLD%m: %~$RESET$RED$(parse_git_branch)$BOLD%(!.#.$) $RESET"
+    PROMPT="$BOLD%m: %~$RESET$RED$(parse_curr_git_branch_name)$BOLD%(!.#.$) $RESET"
 }
 
 function chpwd() {
