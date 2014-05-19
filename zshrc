@@ -5,6 +5,9 @@ unsetopt beep
 setopt SH_WORD_SPLIT
 
 
+export MITRE_GEM_SERVER_USERNAME=mitremedia
+export MITRE_GEM_SERVER_PASSWORD=d0notenter
+
 
 case $TERM in
     screen*)
@@ -31,8 +34,11 @@ alias emacs='/Applications/Emacs.app/Contents/MacOS/Emacs'
 alias tmux='tmux -2'
 alias pine='alpine'
 alias subl='/Applications/Sublime\ Text\ 2.app/Contents/SharedSupport/bin/subl'
+alias ccl32='/usr/local/bin/ccl'
+alias ccl='ccl64'
 
-export PATH=~/.rbenv/shims:/usr/local/bin:/usr/local/sbin:$PATH:$HOME/.gitscripts:$HOME/.cabal/bin:$HOME/bin
+
+export PATH=~/.rbenv/shims:/usr/local/bin:/usr/local/sbin:$PATH:/sbin:$HOME/.gitscripts:$HOME/.cabal/bin:$HOME/bin
 
 export CLICOLOR=1
 export LSCOLORS=ExFxCxDxBxegedabagacad
@@ -76,5 +82,7 @@ function precmd() {
 function chpwd() {
     set_gopath_if_goproj
 }
+export CHEF_REPO=/Users/matt/Source/mitre/chef
+export MITRE_COOKBOOKS=/Users/matt/Source/mitre/mitre-cookbooks
 
-eval "$(rbenv init -)"
+export PATH="$PATH:$HOME/.rvm/bin" # Add RVM to PATH for scripting

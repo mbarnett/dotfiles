@@ -1,4 +1,6 @@
 (set-language-environment "utf-8")
+(prefer-coding-system 'utf-8)
+(setenv "LANG" "en_CA.UTF-8")
 
 ;;; Load el-get
 
@@ -38,7 +40,6 @@
        (mapcar 'el-get-source-name el-get-sources)))
 
 (el-get 'sync my-el-get-packages)
-
 
 
 ;;; Directories
@@ -284,6 +285,7 @@ and overlay is highlighted between MK and END-MK."
 (if (is-mac-gui)
     (progn
       (ns-set-resource nil "ApplePressAndHoldEnabled" "NO")
+      (setq ns-use-srgb-colorspace t)
       (setq ns-pop-up-frames nil)
       (set-fringe-mode 0)
       ;; Read in Mac env variables when launched via GUI
@@ -303,7 +305,8 @@ and overlay is highlighted between MK and END-MK."
       newline-and-indent t
       mouse-wheel-progressive-speed nil
       ring-bell-function 'ignore
-      show-paren-style 'expression)
+      show-paren-style 'expression
+      history-length 1000)
 
 (setq-default indent-tabs-mode nil)
 (setq-default tab-width 4)
@@ -326,6 +329,7 @@ and overlay is highlighted between MK and END-MK."
 (cua-selection-mode t)                      ; CUA for regions only
 (desktop-save-mode 1)
 (global-auto-revert-mode 1)
+(savehist-mode 1)
 
 
 (set-default 'cursor-type 'bar)
@@ -396,6 +400,11 @@ and overlay is highlighted between MK and END-MK."
 ;; Nyan mode
 
 (nyan-mode 1)
+
+
+;; epub mode
+
+(require 'epubmode)
 
 
 ;; Tabbar
