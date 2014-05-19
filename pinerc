@@ -320,7 +320,6 @@ max-remote-connections=
 
 # A list of folders that should be left open once opened (INBOX is implicit)
 stay-open-folders=Gmail,
-	Opal,
 	SixtyOdd
 
 # Sets the time in seconds that Alpine will attempt to open a network
@@ -352,15 +351,13 @@ newmail-window-width=
 # List of incoming msg folders besides INBOX, e.g. ={host2}inbox, {host3}inbox
 # Syntax: optnl-label {optnl-imap-host-name}folder-path
 incoming-folders=Gmail {imap.gmail.com/ssl/user=matt.barnett@gmail.com}INBOX,
-	SixtyOdd {imap.gmail.com/ssl/user=matt@sixtyodd.com}INBOX,
-	Opal {imap.gmail.com/ssl/user=mattb@workwithopal.com}INBOX
+	SixtyOdd {sixtyodd.com/ssl/user=matt@sixtyodd.com/novalidate-cert}INBOX
 
 # List of directories where saved-message folders may be. First one is
 # the default for Saves. Example: Main {host1}mail/[], Desktop mail\[]
 # Syntax: optnl-label {optnl-imap-hostname}optnl-directory-path[]
 folder-collections=Gmail {imap.gmail.com/ssl/user=matt.barnett@gmail.com}[],
-	Opal {imap.gmail.com/ssl/user=mattb@workwithopal.com}[],
-	SixtyOdd {imap.gmail.com/ssl/user=matt@sixtyodd.com}[]
+	SixtyOdd {sixtyodd.com/ssl/user=matt@sixtyodd.com/novalidate-cert}[]
 
 # List, only needed if nntp-server not set, or news is on a different host
 # than used for NNTP posting. Examples: News *[] or News *{host3/nntp}[]
@@ -378,10 +375,10 @@ address-book=
 global-address-book=
 
 # Set by Alpine; controls beginning-of-month sent-mail pruning.
-last-time-prune-questioned=113.5
+last-time-prune-questioned=114.5
 
 # Set by Alpine; controls display of "new version" message.
-last-version-used=6.00
+last-version-used=6.11
 
 # This names the path to an alternative program, and any necessary arguments,
 # to be used in posting mail messages.  Example:
@@ -507,7 +504,7 @@ patterns-other=
 patterns-search=
 
 # Controls display of color
-color-style=use-termdef
+color-style=force-xterm-256color
 
 # Controls display of color for current index line
 current-indexline-style=flip-colors
@@ -516,12 +513,12 @@ current-indexline-style=flip-colors
 titlebar-color-style=default
 
 # Choose: black, blue, green, cyan, red, magenta, yellow, or white.
-normal-foreground-color=000,255,255
-normal-background-color=064,064,064
+normal-foreground-color=000,000,000
+normal-background-color=transparent
 reverse-foreground-color=
 reverse-background-color=
-title-foreground-color=
-title-background-color=
+title-foreground-color=000,000,000
+title-background-color=000,255,000
 title-closed-foreground-color=
 title-closed-background-color=
 status-foreground-color=
@@ -642,3 +639,12 @@ wp-state=
 
 # Web Alpine preferred width for message display in characters
 wp-columns=
+folder-foreground-color=
+folder-background-color=
+directory-foreground-color=
+directory-background-color=
+folder-list-text-foreground-color=
+folder-list-text-background-color=
+
+# Colors in which tokens will be displayed in the index screen
+index-token-colors=

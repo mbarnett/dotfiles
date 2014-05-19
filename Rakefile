@@ -6,7 +6,8 @@ HOME = ENV['HOME']
 IGNORE_FILES = %w[Rakefile README.mdown]
 
 COPY_TO = {
-  "DefaultKeyBinding.dict" => "#{HOME}/Library/KeyBindings"
+  "DefaultKeyBinding.dict" => "#{HOME}/Library/KeyBindings",
+  "com.apple.Terminal.plist" => "#{HOME}/Library/Preferences"
 }
 
 def make_symlink(file)

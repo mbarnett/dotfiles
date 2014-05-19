@@ -30,12 +30,12 @@ autoload -U colors && colors
 
 alias ls='ls -hG'
 alias vim='/Applications/MacVim/mvim'
-alias emacs='/Applications/Emacs.app/Contents/MacOS/Emacs'
+alias emacs='/Applications/Emacs.app/Contents/MacOS/Emacs -nw'
 alias tmux='tmux -2'
 alias pine='alpine'
 alias subl='/Applications/Sublime\ Text\ 2.app/Contents/SharedSupport/bin/subl'
+alias ccl='/usr/local/bin/ccl64'
 alias ccl32='/usr/local/bin/ccl'
-alias ccl='ccl64'
 
 
 export PATH=~/.rbenv/shims:/usr/local/bin:/usr/local/sbin:$PATH:/sbin:$HOME/.gitscripts:$HOME/.cabal/bin:$HOME/bin
