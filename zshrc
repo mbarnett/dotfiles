@@ -27,12 +27,14 @@ autoload -U colors && colors
 
 alias ls='ls -hG'
 alias vim='/Applications/MacVim/mvim'
-alias emacs='/Applications/Emacs.app/Contents/MacOS/Emacs'
+alias emacs='/Applications/Emacs.app/Contents/MacOS/Emacs -nw'
 alias tmux='tmux -2'
 alias pine='alpine'
 alias subl='/Applications/Sublime\ Text\ 2.app/Contents/SharedSupport/bin/subl'
+alias ccl='/usr/local/bin/ccl64'
+alias ccl32='/usr/local/bin/ccl'
 
-export PATH=~/.rbenv/shims:/usr/local/bin:/usr/local/sbin:$PATH:$HOME/.gitscripts:$HOME/.cabal/bin:$HOME/bin
+export PATH=~/.rbenv/shims:/usr/local/bin:/usr/local/sbin:$PATH:$HOME/.gitscripts:$HOME/.cabal/bin:$HOME/bin:/usr/local/gnat/bin
 
 export CLICOLOR=1
 export LSCOLORS=ExFxCxDxBxegedabagacad
