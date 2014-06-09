@@ -7,7 +7,8 @@ IGNORE_FILES = %w[Rakefile README.mdown]
 
 COPY_TO = {
   "DefaultKeyBinding.dict" => "#{HOME}/Library/KeyBindings",
-  "com.apple.Terminal.plist" => "#{HOME}/Library/Preferences"
+  "com.apple.Terminal.plist" => "#{HOME}/Library/Preferences",
+  "private.xml" => "#{HOME}/Library/Application\ Support/KeyRemap4MacBook"
 }
 
 def make_symlink(file)
