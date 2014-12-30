@@ -6,7 +6,7 @@ setopt SH_WORD_SPLIT
 
 
 export MITRE_GEM_SERVER_USERNAME=mitremedia
-export MITRE_GEM_SERVER_PASSWORD=d0notenter
+
 export SATHER_CORE_DIR=~/Source/mitre/sather_core
 export SATHER_BACKEND_DIR=~/Source/mitre/sather_backend
 export SATHER_DESIGN_DIR=~/Source/mitre/sather_design
