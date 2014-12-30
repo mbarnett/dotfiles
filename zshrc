@@ -7,7 +7,12 @@ setopt SH_WORD_SPLIT
 
 export MITRE_GEM_SERVER_USERNAME=mitremedia
 export MITRE_GEM_SERVER_PASSWORD=d0notenter
-
+export SATHER_CORE_DIR=~/Source/mitre/sather_core
+export SATHER_BACKEND_DIR=~/Source/mitre/sather_backend
+export SATHER_DESIGN_DIR=~/Source/mitre/sather_design
+export SATHER_CAPISTRANO_DIR=~/Source/mitre/sather_capistrano
+export SATHER_UTILITIES_DIR=~/Source/mitre/sather_utilities
+export TIKKANEN_DIR=~/Source/mitre/tikkanen
 
 case $TERM in
     screen*)
@@ -38,7 +43,7 @@ alias ccl='/usr/local/bin/ccl64'
 alias ccl32='/usr/local/bin/ccl'
 
 
-export PATH=~/.rbenv/shims:/usr/local/bin:/usr/local/sbin:$PATH:/sbin:$HOME/.gitscripts:$HOME/.cabal/bin:$HOME/bin
+export PATH=~/.rbenv/shims:/usr/local/bin:/usr/local/sbin:$PATH:/sbin:$HOME/.gitscripts:$HOME/.cabal/bin:$HOME/bin:/usr/local/opt/go/libexec/bin
 
 export CLICOLOR=1
 export LSCOLORS=ExFxCxDxBxegedabagacad
@@ -49,7 +54,7 @@ export EDITOR='mg'
 export NODE_PATH=/usr/local/lib/node
 
 # Go
-export GOROOT=/usr/local/Cellar/go/1.0.3
+#export GOROOT=/usr/local/Cellar/go/1.0.3
 export GOBIN=~/bin
 
 function set_gopath_if_goproj() {
@@ -85,4 +90,4 @@ function chpwd() {
 export CHEF_REPO=/Users/matt/Source/mitre/chef
 export MITRE_COOKBOOKS=/Users/matt/Source/mitre/mitre-cookbooks
 
-export PATH="$PATH:$HOME/.rvm/bin" # Add RVM to PATH for scripting
+if which rbenv > /dev/null; then eval "$(rbenv init -)"; fi

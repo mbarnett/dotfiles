@@ -320,6 +320,7 @@ and overlay is highlighted between MK and END-MK."
 
 (global-font-lock-mode 1)                   ; Syntax highlighting
 (delete-selection-mode t)                   ; Overwrite selections when you type
+
 (show-paren-mode t)
 ;(type-break-mode 1)
 ;(type-break-query-mode 1)
@@ -330,6 +331,7 @@ and overlay is highlighted between MK and END-MK."
 (desktop-save-mode 1)
 (global-auto-revert-mode 1)
 (savehist-mode 1)
+(electric-pair-mode 1)
 
 (set-default 'cursor-type 'bar)
 
@@ -384,8 +386,11 @@ and overlay is highlighted between MK and END-MK."
 
 ; for linum-off
 (setq linum-disabled-modes-list '(eshell-mode wl-summary-mode compilation-mode dired-mode speedbar-mode direx:direx-mode))
-
 (global-linum-mode 1)
+
+;; Uniquify
+(require 'uniquify)
+(setq uniquify-buffer-name-style 'post-forward-angle-brackets)
 
 
 ;; w3m Config
@@ -399,12 +404,6 @@ and overlay is highlighted between MK and END-MK."
 ;; Nyan mode
 
 ;(nyan-mode 1)
-
-
-;; epub mode
-
-(require 'epubmode)
-
 
 ;; Tabbar
 
@@ -468,8 +467,6 @@ and overlay is highlighted between MK and END-MK."
 (push '(ack-and-a-half-mode :position bottom :height 20 :dedicated t :stick f)
       popwin:special-display-config)
 
-;(push
-
 (popwin-mode 1)
 
 
@@ -479,7 +476,7 @@ and overlay is highlighted between MK and END-MK."
 (setq projectile-completion-system 'grizzl)
 (projectile-global-mode)
 
-(define-key projectile-mode-map (kbd "M-p")
+(define-key projectile-mode-map (kbd "M-t")
     'projectile-find-file)
 
 (define-key projectile-mode-map [(meta shift f)]
@@ -581,17 +578,12 @@ and overlay is highlighted between MK and END-MK."
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
-; '(custom-safe-themes (quote ("fc5fcb6f1f1c1bc01305694c59a1a861b008c534cae8d0e48e4d5e81ad718bc6" "1e7e097ec8cb1f8c3a912d7e1e0331caeed49fef6cff220be63bd2a6ba4cc365" default)))
  '(nyan-animate-nyancat t)
- '(safe-local-variable-values (quote ((encoding . utf-8)))))
+ '(safe-local-variable-values (quote ((encoding . utf-8))))
+ '(uniquify-min-dir-content 2))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
-; '(col-highlight ((t (:background "black"))))
- '(font-lock-constant-face ((t (:foreground "#af005f"))))
-; '(tabbar-default ((t (:inherit variable-pitch :background "brightyellow" :foreground "black" :weight bold))))
-; '(tabbar-selected ((t (:inherit tabbar-default :foreground "grey" :background "black"))))
-; '(tabbar-unselected ((t (:background "black" :inherit variable-pitch)))))
-)
+ '(font-lock-constant-face ((t (:foreground "#af005f")))))

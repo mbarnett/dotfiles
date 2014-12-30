@@ -22,5 +22,10 @@
     <autogen>__KeyToKey__ KeyCode::COMMAND_L, KeyCode::OPTION_L</autogen>
     <autogen>__KeyToKey__ KeyCode::OPTION_L, KeyCode::COMMAND_L</autogen>
   </item>
-
+  <item>
+    <name>Control+Slash(/) to Control+Underscore(_)</name>
+    <identifier>private.app_terminal_controlslash2controlshiftunderscore</identifier>
+    <only>TERMINAL</only>
+    <autogen>__KeyToKey__ KeyCode::SLASH, ModifierFlag::CONTROL_L, KeyCode::MINUS, ModifierFlag::CONTROL_L | ModifierFlag::SHIFT_L</autogen>
+  </item>
 </root>
