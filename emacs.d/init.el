@@ -322,8 +322,6 @@ and overlay is highlighted between MK and END-MK."
 (delete-selection-mode t)                   ; Overwrite selections when you type
 
 (show-paren-mode t)
-;(type-break-mode 1)
-;(type-break-query-mode 1)
 (column-number-mode t)                      ; Show column number in modeline
 (set-backup-dir backup-dir)                 ; Keep the filesystem tidy
 (transient-mark-mode 1)
@@ -347,8 +345,7 @@ and overlay is highlighted between MK and END-MK."
 
 ;; Font and Appearance
 
-(set-font-if-exists "Menlo-12")              ; Sweet Menlo
-;(load-theme 'solarized-dark t)
+(set-font-if-exists "Menlo-10")              ; Sweet Menlo
 
 
 ;; Default frame size
@@ -423,7 +420,6 @@ and overlay is highlighted between MK and END-MK."
                (find  (aref bname 0) " *")
                (not (member bname '("*scratch*" "*ack*")))
                (not (string-prefix-p "*slime-repl" bname)))
-;              (equal (bname ".type-break"))
               (eq (buffer-local-value 'major-mode buffer) 'direx:direx-mode))))
          (buffer-list))))
 
