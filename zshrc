@@ -4,16 +4,6 @@ SAVEHIST=10000
 unsetopt beep
 setopt SH_WORD_SPLIT
 
-
-export MITRE_GEM_SERVER_USERNAME=mitremedia
-
-export SATHER_CORE_DIR=~/Source/mitre/sather_core
-export SATHER_BACKEND_DIR=~/Source/mitre/sather_backend
-export SATHER_DESIGN_DIR=~/Source/mitre/sather_design
-export SATHER_CAPISTRANO_DIR=~/Source/mitre/sather_capistrano
-export SATHER_UTILITIES_DIR=~/Source/mitre/sather_utilities
-export TIKKANEN_DIR=~/Source/mitre/tikkanen
-
 case $TERM in
     screen*)
         ;; # tmux's TERM is set in .tmux.conf
@@ -26,7 +16,7 @@ esac
 bindkey -e
 
 autoload -Uz compinit && compinit
-compdef -d git
+#compdef -d git
 
 autoload -U select-word-style
 select-word-style bash
@@ -34,14 +24,8 @@ select-word-style bash
 autoload -U colors && colors
 
 alias ls='ls -hG'
-alias vim='/Applications/MacVim/mvim'
-alias emacs='/Applications/Emacs.app/Contents/MacOS/Emacs -nw'
 alias tmux='tmux -2'
 alias pine='alpine'
-alias subl='/Applications/Sublime\ Text\ 2.app/Contents/SharedSupport/bin/subl'
-alias ccl='/usr/local/bin/ccl64'
-alias ccl32='/usr/local/bin/ccl'
-
 
 export PATH=~/.rbenv/shims:/usr/local/bin:/usr/local/sbin:$PATH:/sbin:$HOME/.gitscripts:$HOME/.cabal/bin:$HOME/bin:/usr/local/opt/go/libexec/bin
 
@@ -49,9 +33,6 @@ export CLICOLOR=1
 export LSCOLORS=ExFxCxDxBxegedabagacad
 
 export EDITOR='mg'
-
-# Node.js
-export NODE_PATH=/usr/local/lib/node
 
 # Go
 #export GOROOT=/usr/local/Cellar/go/1.0.3
@@ -87,7 +68,5 @@ function precmd() {
 function chpwd() {
     set_gopath_if_goproj
 }
-export CHEF_REPO=/Users/matt/Source/mitre/chef
-export MITRE_COOKBOOKS=/Users/matt/Source/mitre/mitre-cookbooks
 
 if which rbenv > /dev/null; then eval "$(rbenv init -)"; fi
