@@ -16,7 +16,6 @@ esac
 bindkey -e
 
 autoload -Uz compinit && compinit
-#compdef -d git
 
 autoload -U select-word-style
 select-word-style bash
@@ -27,7 +26,7 @@ alias ls='ls -hG'
 alias tmux='tmux -2'
 alias pine='alpine'
 
-export PATH=~/.rbenv/shims:/usr/local/bin:/usr/local/sbin:$PATH:/sbin:$HOME/.gitscripts:$HOME/.cabal/bin:$HOME/bin:/usr/local/opt/go/libexec/bin
+export PATH=~/.rbenv/shims:/usr/local/bin:/usr/local/sbin:$PATH:/sbin:$HOME/.gitscripts:$HOME/.cabal/bin:$HOME/bin:/usr/local/opt/go/libexec/bin:/opt/p4merge/bin
 
 export CLICOLOR=1
 export LSCOLORS=ExFxCxDxBxegedabagacad
@@ -57,12 +56,21 @@ function parse_curr_git_branch_name() {
   echo " ("${ref#refs/heads/}")"
 }
 
+function git_stash_count() {
+    count=$(git stash list 2> /dev/null | wc -l) || return
+    if [[ $count -gt 0 ]]
+    then
+      echo "{*${count}}"
+    fi
+}
+
 BOLD="%{$fg_bold[blue]%}"
 RED="%{$fg[magenta]%}"
+ALERT="%{$fg[yellow]%}"
 RESET="%{$reset_color%}"
 
 function precmd() {
-    PROMPT="$BOLD%m: %~$RESET$RED$(parse_curr_git_branch_name)$BOLD%(!.#.$) $RESET"
+    PROMPT="$BOLD%m: %~$RESET$RED$(parse_curr_git_branch_name)$BOLD$ALERT$(git_stash_count)$RESET$BOLD%(!.#.$) $RESET"
 }
 
 function chpwd() {
