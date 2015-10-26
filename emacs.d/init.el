@@ -2,6 +2,12 @@
 (prefer-coding-system 'utf-8)
 (setenv "LANG" "en_CA.UTF-8")
 
+; add melpa to elpa for el-get
+
+(require 'package)
+(add-to-list 'package-archives '("melpa" . "http://melpa.milkbox.net/packages/") t)
+(package-initialize)
+
 ;;; Load el-get
 
 (add-to-list 'load-path "~/.emacs.d/el-get/el-get")
@@ -14,8 +20,26 @@
     (eval-print-last-sexp)))
 
 (add-to-list 'el-get-recipe-path "~/.emacs.d/el-get-user/recipes")
+(setq el-get-sources '((:name atom-one-dark-theme :type elpa)))
 
+; my packages
+
+(el-get-bundle atom-one-dark-theme)
 (el-get-bundle exec-path-from-shell)
+(el-get-bundle helm)
+(el-get-bundle popwin)
+(el-get-bundle projectile)
+(el-get-bundle rainbow-delimiters)
+                                        ;smartparens
+                                        ; company-mode
+                                        ; rails/ruby modes
+                                        ;nyan-mode
+                                        ; project-explorer or NeoTree
+                                        ;windmove
+                                        ;flyspell
+
+
+
 
 
 ;;; Directories
@@ -29,6 +53,9 @@
 (defun is-mac ()
   (eq system-type 'darwin))
 
+(defun is-linux ()
+  (eq system-type 'gnu/linux))
+
 (defun is-gui ()
   (not (eq window-system nil)))
 
@@ -36,6 +63,12 @@
   (and
    (is-mac)
    (is-gui)))
+
+(defun is-linux-gui ()
+  (and
+   (is-linux)
+   (is-gui)))
+
 
 (defun set-font-if-exists (font)
   (let ((fallback-font "Courier-12"))
@@ -132,6 +165,7 @@
       split-width-threshold 9999
       history-length 1000)
 
+; spaces for tabs
 (setq-default indent-tabs-mode nil)
 (setq-default tab-width 4)
 
@@ -147,24 +181,38 @@
 (delete-selection-mode t)                   ; Overwrite selections when you type
 
 (show-paren-mode t)
+
 (column-number-mode t)                      ; Show column number in modeline
 (set-backup-dir backup-dir)                 ; Keep the filesystem tidy
 (transient-mark-mode 1)
 (cua-selection-mode t)                      ; CUA for regions only
-;(desktop-save-mode 1)
 (global-auto-revert-mode 1)
 (savehist-mode 1)
 (electric-pair-mode 1)
+(tool-bar-mode -1)
 
 ; nuke trailing whitespace on save
 (add-hook 'before-save-hook 'delete-trailing-whitespace)
 
+
 ;;; Interface
 
+;; Font
 
-;; Font and Appearance
+(if (is-mac-gui)
+	(set-font-if-exists "Menlo-12"))              ; Sweet Menlo
 
-(set-font-if-exists "Menlo-12")              ; Sweet Menlo
+(if (is-linux-gui)
+    (set-font-if-exists "Meslo LG S-10.25"))
+
+;; Theme
+
+(load-theme 'atom-one-dark t)
+
+(set-face-background 'show-paren-match "#3E4451")
+(set-face-attribute 'region nil :background "#0F1011")
+(set-face-background 'highlight "#2C323B")
+
 
 ;; Default frame size
 
@@ -174,25 +222,29 @@
 
 ;; Key rebindings
 
+
 (global-set-key (kbd "C-w") 'back-kill-or-kill-region)
-(global-set-key (kbd "M-/") 'comment-region)
+
 (global-set-key (kbd "C-x C-b") 'switch-to-buffer)
+
 (global-set-key (kbd "C-o") 'open-next-line)
 (global-set-key (kbd "M-o") 'open-previous-line)
 (global-set-key (kbd "C-a") 'move-start-of-line-or-prev-line)
 (global-set-key (kbd "C-e") 'move-end-of-line-or-next-line)
-(global-set-key (kbd "M-<RET>") 'cua-set-rectangle-mark)
-(global-set-key (kbd "C-j") 'ace-jump-word-mode)
-(global-set-key (kbd "C-f") 'forward-word)
-(global-set-key (kbd "C-b") 'backward-word)
-(global-set-key (kbd "M-f") 'forward-char)
-(global-set-key (kbd "M-b") 'backward-char)
 
+(global-set-key (kbd "C-j") 'ace-jump-char-mode)
+
+(global-set-key (kbd "C-t") 'helm-projectile-find-file)
+
+(global-set-key (kbd "M-p M-p") 'helm-projectile-switch-project)
+(global-set-key (kbd "M-p M-f") 'helm-projectile-ag)
+
+(global-set-key (kbd "<home>") 'beginning-of-buffer)
+(global-set-key (kbd "<end>") 'end-of-buffer)
 
 
 ;; Linum
 
-; for linum-off
 (setq linum-disabled-modes-list '(eshell-mode wl-summary-mode compilation-mode dired-mode speedbar-mode direx:direx-mode))
 
 (setq linum-format " %d ")
@@ -202,12 +254,40 @@
 
 (global-hl-line-mode 1)
 
+;; popwin
+(require 'popwin)
+(popwin-mode 1)
+
 
 ;;; Development
-
 
 ;; Basic code settings
 
 (setq-default c-basic-offset 4
               tab-width 4
               indent-tabs-mode nil)
+
+;; rainbow delimiters
+
+(add-hook 'prog-mode-hook 'rainbow-delimiters-mode)
+
+;; Projectile
+
+(projectile-global-mode)
+(setq projectile-completion-system 'helm)
+(helm-projectile-on)
+
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(custom-safe-themes
+   (quote
+    ("cd2a93d7b63aff07b3565c1c95e461cb880f0b00d8dd6cdd10fa8ece01ffcfdf" default))))
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ )

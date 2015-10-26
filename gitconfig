@@ -9,9 +9,7 @@
   editor = mg
   excludesfile = /Users/matt/.gitignore
 [alias]
-  undo-all = reset --hard
-  unstage = reset HEAD
-  track = branch --track
+  rh = reset HEAD
   incoming = !git-incoming.sh
   outgoing = !git-outgoing.sh
   stat = status
@@ -37,4 +35,4 @@
 	prompt = false
 	keepBackup = false
 [push]
-	default = simple
+	default = current
