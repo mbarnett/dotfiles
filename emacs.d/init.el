@@ -25,22 +25,21 @@
 ; my packages
 
 (el-get-bundle atom-one-dark-theme)
+(el-get-bundle company-mode)
 (el-get-bundle exec-path-from-shell)
+(el-get-bundle flyspell)
 (el-get-bundle helm)
+(el-get-bundle neotree)
+(el-get-bundle nyan-mode)
 (el-get-bundle popwin)
 (el-get-bundle projectile)
 (el-get-bundle rainbow-delimiters)
-(el-get-bundle neotree)
+(el-get-bundle tabbar)
+
+
                                         ;smartparens
                                         ; company-mode
                                         ; rails/ruby modes
-                                        ;nyan-mode
-                                        ;windmove
-                                        ;flyspell
-
-
-
-
 
 ;;; Directories
 
@@ -162,7 +161,7 @@
       mouse-wheel-progressive-speed nil
       ring-bell-function 'ignore
       show-paren-style 'expression
-;      split-width-threshold 9999
+      split-width-threshold 9999
       history-length 1000)
 
 ; spaces for tabs
@@ -173,7 +172,9 @@
  ;; `egoge-display-time-face' to make it stand out visually.
 (setq display-time-string-forms
       '((propertize (concat " " 12-hours ":" minutes am-pm)
- 		    'face 'egoge-display-time)))
+                    'face 'egoge-display-time)))
+
+(display-time-mode 1)
 
 (fset 'yes-or-no-p 'y-or-n-p)               ; Those long-form questions are annoying
 
@@ -219,13 +220,20 @@
 (add-to-list 'default-frame-alist '(height . 52))
 (add-to-list 'default-frame-alist '(width . 148))
 
+;; NYAN-MODE!!!111
+
+(setq nyan-wavy-trail t)
+(nyan-mode t)
+(nyan-start-animation)
+
+;; windmove
+
+(windmove-default-keybindings 'meta)
 
 ;; Key rebindings
 
 
 (global-set-key (kbd "C-w") 'back-kill-or-kill-region)
-
-(global-set-key (kbd "C-x C-b") 'switch-to-buffer)
 
 (global-set-key (kbd "C-o") 'open-next-line)
 (global-set-key (kbd "M-o") 'open-previous-line)
@@ -237,10 +245,15 @@
 (global-set-key (kbd "C-t") 'helm-projectile-find-file)
 
 (global-set-key (kbd "M-x") 'helm-M-x)
+(global-set-key (kbd "C-x C-b") 'helm-buffers-list)
+(global-set-key (kbd "C-x b") 'helm-buffers-list)
 
-(global-set-key (kbd "M-p M-p") 'helm-projectile-switch-project)
-                                        ;(global-set-key (kbd "M-p M-f") 'helm-projectile-ag)
+(global-set-key [(meta shift p)] 'helm-projectile-switch-project)
+
 (global-set-key [(meta shift f)] 'helm-projectile-grep)
+
+(global-set-key [(meta shift left)] 'tabbar-backward)
+(global-set-key [(meta shift right)] 'tabbar-forward)
 
 (global-set-key (kbd "<home>") 'beginning-of-buffer)
 (global-set-key (kbd "<end>") 'end-of-buffer)
@@ -273,14 +286,28 @@
 
 (popwin-mode 1)
 
+;; Tabbar
+
+;; place a space around the label to make it looks less crowd
+(defadvice tabbar-buffer-tab-label (after fixup_tab_label_space_and_flag activate)
+  (setq ad-return-value (concat " " (concat ad-return-value " "))))
+
+(tabbar-mode t)
+
 ;; Helm
 
 (setq helm-M-x-fuzzy-match t)
 
 (require 'helm-files)
 (define-key helm-find-files-map (kbd "C-w")
-    'helm-find-files-up-one-level)
+  'helm-find-files-up-one-level)
 
+;; flyspell
+
+(dolist (hook '(text-mode-hook))
+  (add-hook hook (lambda () (flyspell-mode 1))))
+
+(add-hook 'prog-mode-hook 'flyspell-prog-mode)
 
 ;;; Development
 
@@ -299,7 +326,10 @@
 
 (projectile-global-mode)
 (setq projectile-completion-system 'helm)
-(setq projectile-switch-project-action 'neotree-projectile-action)
+
+(define-key projectile-mode-map (kbd "<f8>") '(lambda()
+                                                (interactive)
+                                                (neotree-dir (projectile-project-root))))
 
 (helm-projectile-on)
 
