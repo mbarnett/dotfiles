@@ -30,11 +30,11 @@
 (el-get-bundle popwin)
 (el-get-bundle projectile)
 (el-get-bundle rainbow-delimiters)
+(el-get-bundle neotree)
                                         ;smartparens
                                         ; company-mode
                                         ; rails/ruby modes
                                         ;nyan-mode
-                                        ; project-explorer or NeoTree
                                         ;windmove
                                         ;flyspell
 
@@ -162,7 +162,7 @@
       mouse-wheel-progressive-speed nil
       ring-bell-function 'ignore
       show-paren-style 'expression
-      split-width-threshold 9999
+;      split-width-threshold 9999
       history-length 1000)
 
 ; spaces for tabs
@@ -236,8 +236,11 @@
 
 (global-set-key (kbd "C-t") 'helm-projectile-find-file)
 
+(global-set-key (kbd "M-x") 'helm-M-x)
+
 (global-set-key (kbd "M-p M-p") 'helm-projectile-switch-project)
-(global-set-key (kbd "M-p M-f") 'helm-projectile-ag)
+                                        ;(global-set-key (kbd "M-p M-f") 'helm-projectile-ag)
+(global-set-key [(meta shift f)] 'helm-projectile-grep)
 
 (global-set-key (kbd "<home>") 'beginning-of-buffer)
 (global-set-key (kbd "<end>") 'end-of-buffer)
@@ -254,12 +257,29 @@
 
 (global-hl-line-mode 1)
 
-;; popwin
+;; PopWin and NeoTree integration
+
+(require 'neotree)
 (require 'popwin)
+
+
+(when neo-persist-show
+  (add-hook 'popwin:before-popup-hook
+            (lambda () (setq neo-persist-show nil)))
+  (add-hook 'popwin:after-popup-hook
+            (lambda () (setq neo-persist-show t))))
+
+
+
 (popwin-mode 1)
+
+;; Helm
+
+(setq helm-M-x-fuzzy-match t)
 
 
 ;;; Development
+
 
 ;; Basic code settings
 
@@ -275,7 +295,10 @@
 
 (projectile-global-mode)
 (setq projectile-completion-system 'helm)
+(setq projectile-switch-project-action 'neotree-projectile-action)
+
 (helm-projectile-on)
+
 
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
