@@ -277,6 +277,10 @@
 
 (setq helm-M-x-fuzzy-match t)
 
+(require 'helm-files)
+(define-key helm-find-files-map (kbd "C-w")
+    'helm-find-files-up-one-level)
+
 
 ;;; Development
 
