@@ -288,7 +288,7 @@
 
 ;; place a space around the label to make it looks less crowd
 (defadvice tabbar-buffer-tab-label (after fixup_tab_label_space_and_flag activate)
-  (setq ad-return-value (concat " " (concat ad-return-value " "))))
+  (setq ad-return-value (concat " " ad-return-value " ")))
 
 (tabbar-mode t)
 
