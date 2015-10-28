@@ -19,6 +19,8 @@
     (goto-char (point-max))
     (eval-print-last-sexp)))
 
+(setq el-get-emacswiki-base-url "https://raw.githubusercontent.com/emacsmirror/emacswiki.org/master/")
+
 (add-to-list 'el-get-recipe-path "~/.emacs.d/el-get-user/recipes")
 (setq el-get-sources '((:name atom-one-dark-theme :type elpa)))
 
@@ -29,17 +31,15 @@
 (el-get-bundle exec-path-from-shell)
 (el-get-bundle flyspell)
 (el-get-bundle helm)
+(el-get-bundle linum-off)
 (el-get-bundle neotree)
 (el-get-bundle nyan-mode)
 (el-get-bundle popwin)
 (el-get-bundle projectile)
 (el-get-bundle rainbow-delimiters)
 (el-get-bundle tabbar)
-
-
-                                        ;smartparens
-                                        ; company-mode
-                                        ; rails/ruby modes
+;(el-get-bundle wanderlust)
+(el-get-bundle web-mode)
 
 ;;; Directories
 
@@ -229,6 +229,8 @@
 ;; windmove
 
 (windmove-default-keybindings 'meta)
+(setq windmove-wrap-around t)
+
 
 ;; Key rebindings
 
@@ -242,15 +244,11 @@
 
 (global-set-key (kbd "C-j") 'ace-jump-char-mode)
 
-(global-set-key (kbd "C-t") 'helm-projectile-find-file)
-
 (global-set-key (kbd "M-x") 'helm-M-x)
 (global-set-key (kbd "C-x C-b") 'helm-buffers-list)
 (global-set-key (kbd "C-x b") 'helm-buffers-list)
 
 (global-set-key [(meta shift p)] 'helm-projectile-switch-project)
-
-(global-set-key [(meta shift f)] 'helm-projectile-grep)
 
 (global-set-key [(meta shift left)] 'tabbar-backward)
 (global-set-key [(meta shift right)] 'tabbar-forward)
@@ -261,7 +259,7 @@
 
 ;; Linum
 
-(setq linum-disabled-modes-list '(eshell-mode wl-summary-mode compilation-mode dired-mode speedbar-mode direx:direx-mode))
+(setq linum-disabled-modes-list '(ansi-term-mode wl-summary-mode compilation-mode dired-mode speedbar-mode direx:direx-mode))
 
 (setq linum-format " %d ")
 (global-linum-mode 1)
@@ -299,6 +297,7 @@
 (setq helm-M-x-fuzzy-match t)
 
 (require 'helm-files)
+
 (define-key helm-find-files-map (kbd "C-w")
   'helm-find-files-up-one-level)
 
@@ -309,6 +308,17 @@
 
 (add-hook 'prog-mode-hook 'flyspell-prog-mode)
 
+;; company-mode
+
+; better completion sorting: see: https://github.com/company-mode/company-mode/issues/52
+(setq company-transformers '(company-sort-by-occurrence))
+(setq company-idle-delay 0.3)
+
+(require 'company)
+
+(define-key company-active-map (kbd "TAB") 'company-complete-selection)
+(define-key company-active-map [tab] 'company-complete-selection)
+
 ;;; Development
 
 
@@ -318,18 +328,39 @@
               tab-width 4
               indent-tabs-mode nil)
 
+
+;; Lisp stuff
+
+(setq lisp-simple-loop-indentation 2
+      lisp-loop-keyword-indentation 6
+      lisp-loop-forms-indentation 9)
+
+(font-lock-add-keywords
+ 'lisp-mode
+ '(("[[:space:](]\\([0-9]+\\)[[:space:])]" 1 font-lock-constant-face)
+   ("[[:space:](]\\(nil\\)[[:space:])]" 1 font-lock-constant-face)
+   ("[[:space:](]\\(t\\)[[:space:])]" 1 font-lock-constant-face)))
+
 ;; rainbow delimiters
 
 (add-hook 'prog-mode-hook 'rainbow-delimiters-mode)
 
 ;; Projectile
 
-(projectile-global-mode)
-(setq projectile-completion-system 'helm)
+(setq projectile-completion-system 'helm
+      projectile-switch-project-action 'helm-projectile)
 
-(define-key projectile-mode-map (kbd "<f8>") '(lambda()
-                                                (interactive)
-                                                (neotree-dir (projectile-project-root))))
+(projectile-global-mode)
+
+(define-key projectile-mode-map (kbd "<f8>") (lambda()
+                                               (interactive)
+                                               (neotree-dir (projectile-project-root))))
+
+(define-key projectile-mode-map (kbd "C-t")
+  'helm-projectile-find-file)
+
+(define-key projectile-mode-map [(meta shift f)]
+  'helm-projectile-grep)
 
 (helm-projectile-on)
 
