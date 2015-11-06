@@ -142,14 +142,13 @@
             mac-option-modifier nil
             turn-on-pbcopy)))
 
-(if (is-mac-gui)
-    (progn
-      (ns-set-resource nil "ApplePressAndHoldEnabled" "NO")
-      (setq ns-use-srgb-colorspace t)
-      (setq ns-pop-up-frames nil)
-      (set-fringe-mode 0)
-      ;; Read in Mac env variables when launched via GUI
-      (exec-path-from-shell-initialize)))
+(when (is-mac-gui)
+  (ns-set-resource nil "ApplePressAndHoldEnabled" "NO")
+  (setq ns-use-srgb-colorspace t)
+  (setq ns-pop-up-frames nil)
+  (set-fringe-mode 0)
+  ;; Read in Mac env variables when launched via GUI
+  (exec-path-from-shell-initialize))
 
 ;; Niceties
 
