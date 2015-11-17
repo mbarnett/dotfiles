@@ -28,6 +28,7 @@
 
 (el-get-bundle aaron-em/weatherline-mode.el)
 (el-get-bundle atom-one-dark-theme)
+(el-get-bundle cider)
 (el-get-bundle company-mode)
 (el-get-bundle exec-path-from-shell)
 ;;(el-get-bundle flyspell)
@@ -377,7 +378,7 @@ WHERE can be one of other-window, elscreen, other-frame."
 
 ;; better completion sorting: see: https://github.com/company-mode/company-mode/issues/52
 (setq company-transformers '(company-sort-by-occurrence)
-      company-idle-delay 0.3
+      company-idle-delay 0.2
       company-dabbrev-downcase nil)
 
 (require 'company)

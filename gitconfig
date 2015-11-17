@@ -15,15 +15,12 @@
   stat = status
 [merge]
   keepBackup = false;
-	tool = Kaleidoscope
+  	tool = kdiff3
 [mergetool "p4merge"]
   cmd = p4merge "$BASE" "$LOCAL" "$REMOTE" "$MERGED"
   keepTemporaries = false
   trustExitCode = false
   keepBackup = false
-
-[difftool "Kaleidoscope"]
-	cmd = ksdiff --partial-changeset --relative-path \"$MERGED\" -- \"$LOCAL\" \"$REMOTE\"
 [diff]
 	tool = Kaleidoscope
 [difftool]
