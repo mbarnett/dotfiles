@@ -22,11 +22,12 @@
 (setq el-get-emacswiki-base-url "https://raw.githubusercontent.com/emacsmirror/emacswiki.org/master/")
 
 (add-to-list 'el-get-recipe-path "~/.emacs.d/el-get-user/recipes")
-(setq el-get-sources '((:name atom-one-dark-theme :type elpa)))
-
+(setq el-get-sources '((:name atom-one-dark-theme :type elpa)
+                       (:name adjust-parens :type elpa)))
 ;; my packages
 
 (el-get-bundle aaron-em/weatherline-mode.el)
+(el-get-bundle adjust-parens)
 (el-get-bundle atom-one-dark-theme)
 (el-get-bundle cider)
 (el-get-bundle company-mode)
@@ -72,7 +73,6 @@
   (and
    (is-linux)
    (is-gui)))
-
 
 (defun set-font-if-exists (font)
   (let ((fallback-font "Courier-12"))
