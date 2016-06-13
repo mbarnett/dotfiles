@@ -4,6 +4,9 @@ SAVEHIST=10000
 unsetopt beep
 setopt SH_WORD_SPLIT
 
+# Seriously, Homebrew?
+HOMEBREW_NO_ANALYTICS=1
+
 case $TERM in
     screen*)
         ;; # tmux's TERM is set in .tmux.conf
@@ -39,10 +42,18 @@ function parse_curr_git_branch_name() {
 }
 
 function git_stash_count() {
-    count=$(git stash list 2> /dev/null | wc -l) || return
+    count=$(git stash list 2> /dev/null | wc -l | awk '{print $1}') || return
     if [[ $count -gt 0 ]]
     then
       echo "{*${count}}"
+    fi
+}
+
+function jobs_count() {
+    count=$((jobs -s) | wc -l | awk '{print $1}') || return
+    if [[ $count -gt 0 ]]
+    then
+        echo "{&${count}}"
     fi
 }
 
@@ -52,7 +63,7 @@ ALERT="%{$fg[yellow]%}"
 RESET="%{$reset_color%}"
 
 function precmd() {
-    PROMPT="$BOLD%m: %~$RESET$RED$(parse_curr_git_branch_name)$BOLD$ALERT$(git_stash_count)$RESET$BOLD%(!.#.$) $RESET"
+    PROMPT="$BOLD%m: %~$RESET$RED$(parse_curr_git_branch_name)$BOLD$ALERT$(git_stash_count)$RESET$BOLD$ALERT$(jobs_count)$RESET$BOLD%(!.#.$) $RESET"
 }
 
 export PATH="$PATH:$HOME/.rvm/bin" # Add RVM to PATH for scripting

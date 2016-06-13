@@ -26,13 +26,11 @@
                        (:name adjust-parens :type elpa)))
 ;; my packages
 
-(el-get-bundle aaron-em/weatherline-mode.el)
 (el-get-bundle adjust-parens)
 (el-get-bundle atom-one-dark-theme)
 (el-get-bundle cider)
 (el-get-bundle company-mode)
 (el-get-bundle exec-path-from-shell)
-;;(el-get-bundle flyspell)
 (el-get-bundle helm)
 (el-get-bundle linum-off)
 (el-get-bundle neotree)
@@ -40,9 +38,9 @@
 (el-get-bundle popwin)
 (el-get-bundle projectile)
 (el-get-bundle rainbow-delimiters)
+(el-get-bundle seq)
 (el-get-bundle solarized-emacs)
 (el-get-bundle tabbar)
-(el-get-bundle wanderlust)
 (el-get-bundle web-mode)
 
 ;;; Directories
@@ -86,7 +84,7 @@
         `(( "." . ,dir))))
 
 
-                                        ; Like vi's o command
+;; Like vi's o command
 (defun open-next-line (arg)
   "Move to the next line and then opens a line.
     See also `newline-and-indent'."
@@ -97,7 +95,7 @@
   (when newline-and-indent
     (indent-according-to-mode)))
 
-                                        ; Like vi's O command
+;; Like vi's O command
 (defun open-previous-line (arg)
   "Open a new line before the current one.
      See also `newline-and-indent'."
@@ -167,7 +165,7 @@
       split-width-threshold 9999
       history-length 1000)
 
-                                        ; spaces for tabs
+;; spaces for tabs
 (setq-default indent-tabs-mode nil)
 (setq-default tab-width 4)
 
@@ -194,7 +192,19 @@
 (electric-pair-mode 1)
 (tool-bar-mode -1)
 
-                                        ; nuke trailing whitespace on save
+
+(require 'xt-mouse)
+(xterm-mouse-mode)
+(require 'mouse)
+(xterm-mouse-mode t)
+(defun track-mouse (e))
+
+(setq mouse-wheel-follow-mouse 't)
+
+(global-set-key (kbd "<mouse-4>") 'scroll-down-line)
+(global-set-key (kbd "<mouse-5>") 'scroll-up-line)
+
+;; nuke trailing whitespace on save
 (add-hook 'before-save-hook 'delete-trailing-whitespace)
 
 
@@ -209,9 +219,24 @@
     (set-font-if-exists "Meslo LG S-10.25"))
 
 ;; Theme
-(require 'unfucked-solarize)
+;(if (display-graphic-p)
+    (require 'unfucked-solarize)
+  ;; (progn
+  ;;   (load-theme 'tsdh-dark)
+  ;;   (set-face-attribute 'linum nil :foreground "#4E4E4E")))
 
-;;(require 'better-atom-one-dark)
+;; (with-eval-after-load "helm"
+;;   (set-face-attribute 'helm-selection nil :underline nil :background "#004B5F" :foreground "#b58900")
+;;   (set-face-attribute 'helm-source-header nil :background "#859900"))
+
+
+
+(defun on-after-init ()
+  (unless (display-graphic-p (selected-frame))
+    (set-face-background 'default "unspecified-bg" (selected-frame))))
+
+(add-hook 'window-setup-hook 'on-after-init)
+
 
 ;; Default frame size
 
@@ -220,24 +245,14 @@
 
 ;; NYAN-MODE!!!111
 
-(setq nyan-wavy-trail t)
-(nyan-mode t)
-(nyan-start-animation)
-
-;; weather
-
-(require 'weatherline-mode)
-
-(setq weatherline-location "Edmonton,CA")
-(setq weatherline-location-id "5946768")
-(setq weatherline-units "metric")
-(setq weatherline-temperature-indicator "°C")
-(setq weatherline-lighter-include-humidity nil)
-(weatherline-mode t)
+(when (display-graphic-p)
+    (setq nyan-wavy-trail t)
+    (nyan-mode t)
+    (nyan-start-animation))
 
 ;; windmove
 
-(windmove-default-keybindings 'meta)
+(windmove-default-keybindings 'shift)
 (setq windmove-wrap-around t)
 
 
@@ -260,8 +275,8 @@
 
 (global-set-key [(meta shift p)] 'helm-projectile-switch-project)
 
-(global-set-key [(meta shift left)] 'tabbar-backward)
-(global-set-key [(meta shift right)] 'tabbar-forward)
+(global-set-key [(meta left)] 'tabbar-backward)
+(global-set-key [(meta right)] 'tabbar-forward)
 
 (global-set-key (kbd "<home>") 'beginning-of-buffer)
 (global-set-key (kbd "<end>") 'end-of-buffer)
@@ -316,63 +331,11 @@
   (setq helm-split-window-in-side-p t
         helm-M-x-fuzzy-match t)
   (define-key helm-map (kbd "C-w")
-    'back-kill-or-kill-region)
+    'back-kill-or-kill-region))
 
-  (defun find-marked-candidates ()
-    (cl-dolist (cand (helm-marked-candidates))
-      (find-file-noselect cand)))
+(eval-after-load 'helm-mode
+    '(add-to-list 'helm-completing-read-handlers-alist '(find-file)))
 
-  (defun helm-grep-action (candidate &optional where mark)
-  "Define a default action for `helm-do-grep' on CANDIDATE.
-WHERE can be one of other-window, elscreen, other-frame."
-  (let* ((split        (helm-grep-split-line candidate))
-         (lineno       (string-to-number (nth 1 split)))
-         (loc-fname        (or (with-current-buffer
-                                   (if (eq major-mode 'helm-grep-mode)
-                                       (current-buffer)
-                                       helm-buffer)
-                                 (get-text-property (point-at-bol) 'help-echo))
-                               (car split)))
-         (tramp-method (file-remote-p (or helm-ff-default-directory
-                                          default-directory) 'method))
-         (tramp-host   (file-remote-p (or helm-ff-default-directory
-                                          default-directory) 'host))
-         (tramp-prefix (concat "/" tramp-method ":" tramp-host ":"))
-         (fname        (if tramp-host
-                           (concat tramp-prefix loc-fname) loc-fname)))
-    (cl-case where
-      (other-window (find-file-other-window fname))
-      (elscreen     (helm-elscreen-find-file fname))
-      (other-frame  (find-file-other-frame fname))
-      (grep         (helm-grep-save-results-1))
-      (pdf          (if helm-pdfgrep-default-read-command
-                        (helm-pdfgrep-action-1 split lineno (car split))
-                      (find-file (car split)) (doc-view-goto-page lineno)))
-      (t            (find-marked-candidates)))
-    (unless (or (eq where 'grep) (eq where 'pdf))
-      (helm-goto-line lineno))
-    (when mark
-      (set-marker (mark-marker) (point))
-      (push-mark (point) 'nomsg))
-    ;; Save history
-    (unless (or helm-in-persistent-action
-                (eq major-mode 'helm-grep-mode)
-                (string= helm-pattern ""))
-      (setq helm-grep-history
-            (cons helm-pattern
-                  (delete helm-pattern helm-grep-history)))
-      (when (> (length helm-grep-history)
-               helm-grep-max-length-history)
-        (setq helm-grep-history
-              (delete (car (last helm-grep-history)))))))))
-
-
-;; flyspell
-
-(dolist (hook '(text-mode-hook))
-  (add-hook hook (lambda () (flyspell-mode 1))))
-
-;;(add-hook 'prog-mode-hook 'flyspell-prog-mode)
 
 ;; company-mode
 
@@ -380,6 +343,8 @@ WHERE can be one of other-window, elscreen, other-frame."
 (setq company-transformers '(company-sort-by-occurrence)
       company-idle-delay 0.2
       company-dabbrev-downcase nil)
+
+(setq company-clang-arguments '("-std=c++14" "-I/usr/local/include"))
 
 (require 'company)
 
@@ -410,7 +375,7 @@ WHERE can be one of other-window, elscreen, other-frame."
   (add-to-list 'auto-mode-alist (cons extension 'web-mode)))
 
 
-                                        ;use server-side comments
+;;use server-side comments
 (setq web-mode-comment-style 2)
 
 ;; ruby mode
@@ -420,7 +385,7 @@ WHERE can be one of other-window, elscreen, other-frame."
 (add-to-list 'auto-mode-alist
              '("\\(?:Brewfile\\|Capfile\\|Gemfile\\(?:\\.[a-zA-Z0-9._-]+\\)?\\|[rR]akefile\\)\\'" . ruby-mode))
 
-                                        ; fix ruby's screwy indentation
+;; fix ruby's screwy indentation
 
 (defadvice ruby-indent-line (after unindent-closing-paren activate)
   (let ((column (current-column))
@@ -470,7 +435,11 @@ WHERE can be one of other-window, elscreen, other-frame."
 (setq slime-net-coding-system 'utf-8-unix) ; utf-8 support for clozure
 (slime-setup '(slime-fancy slime-banner))
 
-(setq inferior-lisp-program "/home/matt/bin/ccl")
+(setq inferior-lisp-program "/usr/local/bin/ccl64")
+
+
+(add-hook 'cider-repl-mode-hook #'company-mode)
+(add-hook 'cider-mode-hook #'company-mode)
 
 
 ;; rainbow delimiters
@@ -504,7 +473,7 @@ WHERE can be one of other-window, elscreen, other-frame."
  ;; If there is more than one, they won't work right.
  '(custom-safe-themes
    (quote
-    ("8aebf25556399b58091e533e455dd50a6a9cba958cc4ebb0aab175863c25b9a4" "cd2a93d7b63aff07b3565c1c95e461cb880f0b00d8dd6cdd10fa8ece01ffcfdf" default)))
+    ("d677ef584c6dfc0697901a44b885cc18e206f05114c8a3b7fde674fce6180879" "8aebf25556399b58091e533e455dd50a6a9cba958cc4ebb0aab175863c25b9a4" "cd2a93d7b63aff07b3565c1c95e461cb880f0b00d8dd6cdd10fa8ece01ffcfdf" default)))
  '(weatherline-location-id 5946768))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
