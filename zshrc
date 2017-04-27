@@ -15,6 +15,8 @@ case $TERM in
         ;;
 esac
 
+ulimit -n 2048
+
 # emacs style
 bindkey -e
 
@@ -28,12 +30,14 @@ autoload -U colors && colors
 alias ls='ls -hG'
 alias tmux='tmux -2'
 alias pine='alpine'
+alias ccl='ccl64'
+alias ccl32='/usr/local/bin/ccl'
 
 export PATH=/usr/local/bin:/usr/local/sbin:$PATH:/sbin:$HOME/bin
 
 export CLICOLOR=1
 export LSCOLORS=ExFxCxDxBxegedabagacad
-
+export DISABLE_PRY_RAILS=1
 export EDITOR='mg'
 
 function parse_curr_git_branch_name() {
@@ -67,3 +71,4 @@ function precmd() {
 }
 
 export PATH="$PATH:$HOME/.rvm/bin" # Add RVM to PATH for scripting
+source ~/.cargo/env
