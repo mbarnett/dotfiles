@@ -5,15 +5,15 @@
 (setq solarized-height-plus-3 1)
 (setq solarized-height-plus-4 1)
 (setq x-underline-at-descent-line t)
-(setq solarized-emphasize-indicators nil)
+(setq solarized-emphasize-indicators t)
 (setq solarized-use-variable-pitch nil)
 (setq solarized-use-less-bold t)
 
 (load-theme 'solarized-light t)
 
-;; (defun unfuck-solarize-faces ()
+ (defun unfuck-solarize-faces ()
 ;;   (set-face-attribute 'font-lock-warning-face nil :foreground "#d33682")
-;;   (set-face-attribute 'font-lock-constant-face nil :bold nil)
+   (set-face-attribute 'font-lock-constant-face nil :bold nil))
 ;;   (set-face-attribute 'region nil :background "#094554" :foreground nil)
 ;;   (set-face-attribute 'show-paren-match nil :foreground nil :background "#004B5F"))
 
@@ -32,9 +32,9 @@
   (set-face-attribute 'rainbow-delimiters-unmatched-face nil :background "#dc322f" :foreground nil :inverse-video nil))
 
 ;; solarized clobers some of the faces when a new frame initializes, so we need to re-unfuck things
-;; (add-hook 'after-make-frame-functions (lambda (frame)
-;;                                         (unfuck-solarize-faces)))
+(add-hook 'after-make-frame-functions (lambda (frame)
+                                        (unfuck-solarize-faces)))
 
-;; (unfuck-solarize-faces)
+(unfuck-solarize-faces)
 
 (provide 'unfucked-solarize)

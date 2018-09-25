@@ -14,13 +14,8 @@
   outgoing = !git-outgoing.sh
   stat = status
 [merge]
-  keepBackup = false;
-  	tool = kdiff3
-[mergetool "p4merge"]
-  cmd = p4merge "$BASE" "$LOCAL" "$REMOTE" "$MERGED"
-  keepTemporaries = false
-  trustExitCode = false
-  keepBackup = false
+	keepBackup = false;
+	tool = Kaleidoscope
 [diff]
 	tool = Kaleidoscope
 [difftool]
@@ -28,8 +23,6 @@
 [mergetool "Kaleidoscope"]
 	cmd = ksdiff --merge --output \"$MERGED\" --base \"$BASE\" -- \"$LOCAL\" --snapshot \"$REMOTE\" --snapshot
 	trustExitCode = true
-[mergetool]
-	prompt = false
 	keepBackup = false
 [push]
 	default = current

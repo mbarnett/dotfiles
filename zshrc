@@ -3,9 +3,12 @@ HISTSIZE=10000
 SAVEHIST=10000
 unsetopt beep
 setopt SH_WORD_SPLIT
-
+export DISABLE_SPRING=1
+export DISABLE_PRY_RAILS=1
 # Seriously, Homebrew?
-HOMEBREW_NO_ANALYTICS=1
+export HOMEBREW_NO_ANALYTICS=1
+
+export PATH=/usr/local/bin:/usr/local/sbin:$PATH:/sbin:$HOME/bin
 
 case $TERM in
     screen*)
@@ -33,8 +36,6 @@ alias pine='alpine'
 alias ccl='ccl64'
 alias ccl32='/usr/local/bin/ccl'
 
-export PATH=/usr/local/bin:/usr/local/sbin:$PATH:/sbin:$HOME/bin
-
 export CLICOLOR=1
 export LSCOLORS=ExFxCxDxBxegedabagacad
 export DISABLE_PRY_RAILS=1
@@ -49,7 +50,7 @@ function git_stash_count() {
     count=$(git stash list 2> /dev/null | wc -l | awk '{print $1}') || return
     if [[ $count -gt 0 ]]
     then
-      echo "{*${count}}"
+      echo "(⚡️ ${count})"
     fi
 }
 
@@ -57,7 +58,7 @@ function jobs_count() {
     count=$((jobs -s) | wc -l | awk '{print $1}') || return
     if [[ $count -gt 0 ]]
     then
-        echo "{&${count}}"
+        echo "(♺ ${count})"
     fi
 }
 
@@ -67,8 +68,9 @@ ALERT="%{$fg[yellow]%}"
 RESET="%{$reset_color%}"
 
 function precmd() {
-    PROMPT="$BOLD%m: %~$RESET$RED$(parse_curr_git_branch_name)$BOLD$ALERT$(git_stash_count)$RESET$BOLD$ALERT$(jobs_count)$RESET$BOLD%(!.#.$) $RESET"
+    PROMPT="$BOLD%m: %~$RESET$RED$(parse_curr_git_branch_name)$BOLD$ALERT$(git_stash_count)$RESET$BOLD$ALERT$(jobs_count)$RESET$BOLD%(!.#.✨) $RESET "
 }
 
 export PATH="$PATH:$HOME/.rvm/bin" # Add RVM to PATH for scripting
 source ~/.cargo/env
+[[ -s /Users/matt/.rvm/scripts/rvm ]] && source /Users/matt/.rvm/scripts/rvm # Load RVM into a shell session *as a function*

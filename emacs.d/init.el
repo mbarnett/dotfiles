@@ -22,26 +22,35 @@
 (setq el-get-emacswiki-base-url "https://raw.githubusercontent.com/emacsmirror/emacswiki.org/master/")
 
 (add-to-list 'el-get-recipe-path "~/.emacs.d/el-get-user/recipes")
-(setq el-get-sources '((:name atom-one-dark-theme :type elpa)
-                       (:name adjust-parens :type elpa)))
+
 ;; my packages
 
 (el-get-bundle adjust-parens)
-(el-get-bundle atom-one-dark-theme)
+(el-get-bundle all-the-icons)
 (el-get-bundle cider)
 (el-get-bundle company-mode)
+(el-get-bundle emacs-async)
 (el-get-bundle exec-path-from-shell)
+;(el-get-bundle fill-column-indicator)
 (el-get-bundle helm)
+(el-get-bundle helm-ag)
+(el-get-bundle helm-projectile)
 (el-get-bundle linum-off)
 (el-get-bundle neotree)
 (el-get-bundle nyan-mode)
-(el-get-bundle popwin)
+;(el-get-bundle popwin)
 (el-get-bundle projectile)
 (el-get-bundle rainbow-delimiters)
+(el-get-bundle rich-minority)
+(el-get-bundle rvm)
+(el-get-bundle s)
 (el-get-bundle seq)
 (el-get-bundle solarized-emacs)
 (el-get-bundle tabbar)
+(el-get-bundle web)
 (el-get-bundle web-mode)
+(el-get-bundle yasnippet)
+
 
 ;;; Directories
 
@@ -50,6 +59,7 @@
       local-lisp-dir (concat config-dir "local-lisp"))
 
 (add-to-list 'load-path local-lisp-dir)
+
 
 ;;; Functions
 
@@ -76,7 +86,8 @@
   (let ((fallback-font "Courier-12"))
     (if (is-gui)
         (if (null (x-list-fonts font))
-            (set-frame-font fallback-font nil t) (set-frame-font font nil t)))))
+            (set-frame-font fallback-font nil t)
+          (set-frame-font font nil t)))))
 
 
 (defun set-backup-dir (dir)
@@ -112,13 +123,11 @@
       (kill-region (region-beginning) (region-end))
     (backward-kill-word arg)))
 
-
 (defun move-end-of-line-or-next-line ()
   (interactive)
   (if (eolp)
       (next-line)
     (move-end-of-line nil)))
-
 
 (defun move-start-of-line-or-prev-line ()
   (interactive)
@@ -131,23 +140,22 @@
 
 ;; Mac & GUI specific stuff
 
-
-(if (is-mac)
-    (progn
-      (setq browse-url-browser-function 'browse-url-default-macosx-browser
-            mac-option-key-is-meta nil
-            mac-command-key-is-meta t
-            mac-command-modifier 'meta
-            mac-option-modifier nil
-            turn-on-pbcopy)))
+(when (is-mac)
+    (setq browse-url-browser-function 'browse-url-default-macosx-browser
+	  mac-option-key-is-meta nil
+	  mac-command-key-is-meta t
+	  mac-command-modifier 'meta
+	  mac-option-modifier nil
+	  turn-on-pbcopy t))
 
 (when (is-mac-gui)
-  (ns-set-resource nil "ApplePressAndHoldEnabled" "NO")
   (setq ns-use-srgb-colorspace t)
   (setq ns-pop-up-frames nil)
   (set-fringe-mode 0)
   ;; Read in Mac env variables when launched via GUI
-  (exec-path-from-shell-initialize))
+  )
+
+(exec-path-from-shell-initialize)
 
 ;; Niceties
 
@@ -159,50 +167,45 @@
       auto-save-default nil
       vc-follow-symlinks nil
       newline-and-indent t
-      mouse-wheel-progressive-speed nil
       ring-bell-function 'ignore
       show-paren-style 'expression
       split-width-threshold 9999
-      history-length 1000)
+      history-length 1000
+      mouse-autoselect-window t
+      neo-window-fixed-size nil)
+
 
 ;; spaces for tabs
 (setq-default indent-tabs-mode nil)
 (setq-default tab-width 4)
 
+(setq-default fill-column 120)
+
+(setq-default truncate-lines t)
+
 (setq display-time-string-forms
       '((propertize (concat " " 12-hours ":" minutes am-pm))))
+(setq frame-title-format "%b")
 
 (display-time-mode 1)
 (blink-cursor-mode -1)
 (scroll-bar-mode -1)
 
-(fset 'yes-or-no-p 'y-or-n-p)               ; Those long-form questions are annoying
+(fset 'yes-or-no-p 'y-or-n-p)  ;; Those long-form questions are annoying
 
-(global-font-lock-mode 1)                   ; Syntax highlighting
-(delete-selection-mode t)                   ; Overwrite selections when you type
+(global-font-lock-mode 1)      ;; Syntax highlighting
+(delete-selection-mode t)      ;; Overwrite selections when you type
 
 (show-paren-mode t)
 
-(column-number-mode t)                      ; Show column number in modeline
-(set-backup-dir backup-dir)                 ; Keep the filesystem tidy
+(column-number-mode t)         ;; Show column number in modeline
+(set-backup-dir backup-dir)    ;; Keep the filesystem tidy
 (transient-mark-mode 1)
-(cua-selection-mode t)                      ; CUA for regions only
+(cua-selection-mode t)         ;; CUA for regions only
 (global-auto-revert-mode t)
 (savehist-mode 1)
 (electric-pair-mode 1)
 (tool-bar-mode -1)
-
-
-(require 'xt-mouse)
-(xterm-mouse-mode)
-(require 'mouse)
-(xterm-mouse-mode t)
-(defun track-mouse (e))
-
-(setq mouse-wheel-follow-mouse 't)
-
-(global-set-key (kbd "<mouse-4>") 'scroll-down-line)
-(global-set-key (kbd "<mouse-5>") 'scroll-up-line)
 
 ;; nuke trailing whitespace on save
 (add-hook 'before-save-hook 'delete-trailing-whitespace)
@@ -213,35 +216,27 @@
 ;; Font
 
 (if (is-mac-gui)
-	(set-font-if-exists "Menlo-12"))              ; Sweet Menlo
+	(set-font-if-exists "Menlo-13")) ;; Sweet Menlo
 
 (if (is-linux-gui)
     (set-font-if-exists "Meslo LG S-10.25"))
 
 ;; Theme
-;(if (display-graphic-p)
-    (require 'unfucked-solarize)
-  ;; (progn
-  ;;   (load-theme 'tsdh-dark)
-  ;;   (set-face-attribute 'linum nil :foreground "#4E4E4E")))
-
-;; (with-eval-after-load "helm"
-;;   (set-face-attribute 'helm-selection nil :underline nil :background "#004B5F" :foreground "#b58900")
-;;   (set-face-attribute 'helm-source-header nil :background "#859900"))
-
-
-
-(defun on-after-init ()
-  (unless (display-graphic-p (selected-frame))
-    (set-face-background 'default "unspecified-bg" (selected-frame))))
-
-(add-hook 'window-setup-hook 'on-after-init)
+(if (display-graphic-p)
+    (require 'unfucked-solarize))
 
 
 ;; Default frame size
 
 (add-to-list 'default-frame-alist '(height . 52))
 (add-to-list 'default-frame-alist '(width . 148))
+
+
+;; hide my numerous minor-modes, since it isn't very useful to see them
+
+(setf rm-whitelist "a-fake-minor-mode-nothing-will-match")
+(rich-minority-mode 1)
+
 
 ;; NYAN-MODE!!!111
 
@@ -250,6 +245,7 @@
     (nyan-mode t)
     (nyan-start-animation))
 
+
 ;; windmove
 
 (windmove-default-keybindings 'shift)
@@ -257,7 +253,6 @@
 
 
 ;; Key rebindings
-
 
 (global-set-key (kbd "C-w") 'back-kill-or-kill-region)
 
@@ -296,26 +291,21 @@
 ;; PopWin and NeoTree integration
 
 (require 'neotree)
-(require 'popwin)
+(setq neo-autorefresh nil)
+(setq neo-theme 'icons)
+(setq inhibit-compacting-font-caches t)
 
+;;(require 'popwin)
 
-(when neo-persist-show
-  (add-hook 'popwin:before-popup-hook
-            (lambda () (setq neo-persist-show nil)))
-  (add-hook 'popwin:after-popup-hook
-            (lambda () (setq neo-persist-show t))))
+;;(popwin-mode 1)
 
-
-
-(popwin-mode 1)
 
 ;; Tabbar
 
-;; place a space around the label to make it looks less crowd
-(defadvice tabbar-buffer-tab-label (after fixup_tab_label_space_and_flag activate)
-  (setq ad-return-value (concat " " ad-return-value " ")))
+(require 'aquamacs-tabbar)
 
 (tabbar-mode t)
+
 
 ;; Helm
 
@@ -353,8 +343,8 @@
 
 (add-hook 'prog-mode-hook 'company-mode)
 
-;;; Development
 
+;;; Development
 
 ;; Basic code settings
 
@@ -365,7 +355,7 @@
 (add-hook 'prog-mode-hook
           (lambda ()
             (font-lock-add-keywords nil
-                                    '(("\\<\\(FIXME\\|TODO\\|BUG\\)\\s-" 1 font-lock-warning-face t)))))
+                                    '(("\\<\\(FIXME\\|TODO\\|BUG\\):*\\s-" 1 font-lock-warning-face t)))))
 
 ;; webmode
 
@@ -373,6 +363,10 @@
 
 (dolist (extension (list "\\.phtml\\'" "\\.tpl\\.php\\'" "\\.[agj]sp\\'" "\\.djhtml\\'" "\\.mustache\\'" "\\.erb\\'" "\\.as[cp]x\\'"))
   (add-to-list 'auto-mode-alist (cons extension 'web-mode)))
+
+(setq web-mode-markup-indent-offset 2)
+(setq web-mode-css-indent-offset 2)
+(setq web-mode-code-indent-offset 2)
 
 
 ;;use server-side comments
@@ -432,11 +426,12 @@
 
 (load (expand-file-name "~/.quicklisp/slime-helper.el"))
 
-(setq slime-net-coding-system 'utf-8-unix) ; utf-8 support for clozure
+;(setq slime-net-coding-system 'utf-8-utf) ;; unix-8 support for clozure
 (slime-setup '(slime-fancy slime-banner))
 
 (setq inferior-lisp-program "/usr/local/bin/ccl64")
 
+;; clojure
 
 (add-hook 'cider-repl-mode-hook #'company-mode)
 (add-hook 'cider-mode-hook #'company-mode)
@@ -445,6 +440,7 @@
 ;; rainbow delimiters
 
 (add-hook 'prog-mode-hook 'rainbow-delimiters-mode)
+
 
 ;; Projectile
 
@@ -466,6 +462,10 @@
 (helm-projectile-on)
 
 
+(setq forecast-api-key "e3df20dea7c305ca509f1f623b344dec")
+(setq forecast-coordinates "53.5444,-113.4909")
+
+
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -474,6 +474,9 @@
  '(custom-safe-themes
    (quote
     ("d677ef584c6dfc0697901a44b885cc18e206f05114c8a3b7fde674fce6180879" "8aebf25556399b58091e533e455dd50a6a9cba958cc4ebb0aab175863c25b9a4" "cd2a93d7b63aff07b3565c1c95e461cb880f0b00d8dd6cdd10fa8ece01ffcfdf" default)))
+ '(package-selected-packages
+   (quote
+    (memoize font-lock+ queue atom-one-dark-theme adjust-parens)))
  '(weatherline-location-id 5946768))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.

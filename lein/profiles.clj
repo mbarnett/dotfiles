@@ -1,1 +1,1 @@
-{:user {:plugins [[venantius/ultra "0.4.1"]]}}
+{:user {:plugins [[venantius/ultra "0.5.1"]]}}
