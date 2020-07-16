@@ -2,22 +2,20 @@
 (prefer-coding-system 'utf-8)
 (setenv "LANG" "en_CA.UTF-8")
 
-;; add melpa to elpa for el-get
-
-(require 'package)
-(add-to-list 'package-archives '("melpa" . "http://melpa.milkbox.net/packages/") t)
-(package-initialize)
-
-;;; Load el-get
-
 (add-to-list 'load-path "~/.emacs.d/el-get/el-get")
 
 (unless (require 'el-get nil 'noerror)
-  (with-current-buffer
-      (url-retrieve-synchronously
-       "https://raw.githubusercontent.com/dimitri/el-get/master/el-get-install.el")
-    (goto-char (point-max))
-    (eval-print-last-sexp)))
+  (require 'package)
+  (add-to-list 'package-archives
+               '("melpa" . "http://melpa.org/packages/"))
+  (package-refresh-contents)
+  (package-initialize)
+  (package-install 'el-get)
+  (require 'el-get))
+
+(add-to-list 'el-get-recipe-path "~/.emacs.d/el-get-user/recipes")
+(el-get 'sync)
+
 
 (setq el-get-emacswiki-base-url "https://raw.githubusercontent.com/emacsmirror/emacswiki.org/master/")
 
@@ -25,20 +23,20 @@
 
 ;; my packages
 
-(el-get-bundle adjust-parens)
+;(el-get-bundle adjust-parens)
 (el-get-bundle all-the-icons)
 (el-get-bundle cider)
 (el-get-bundle company-mode)
+(el-get-bundle dumb-jump)
 (el-get-bundle emacs-async)
 (el-get-bundle exec-path-from-shell)
 ;(el-get-bundle fill-column-indicator)
 (el-get-bundle helm)
-(el-get-bundle helm-ag)
 (el-get-bundle helm-projectile)
 (el-get-bundle linum-off)
 (el-get-bundle neotree)
 (el-get-bundle nyan-mode)
-;(el-get-bundle popwin)
+(el-get-bundle popwin)
 (el-get-bundle projectile)
 (el-get-bundle rainbow-delimiters)
 (el-get-bundle rich-minority)
@@ -56,10 +54,14 @@
 
 (setq config-dir (expand-file-name "~/.emacs.d/")
       backup-dir (concat config-dir "backups")
-      local-lisp-dir (concat config-dir "local-lisp"))
+      local-lisp-dir (concat config-dir "local-lisp")
+      theme-dir (concat config-dir "themes"))
 
 (add-to-list 'load-path local-lisp-dir)
+(require 'helm-ag)
 
+(add-to-list 'custom-theme-load-path theme-dir)
+(load-theme 'cyberpunk-2019 t)
 
 ;;; Functions
 
@@ -116,12 +118,20 @@
   (when newline-and-indent
     (indent-according-to-mode)))
 
+(defun delete-word (arg)
+  "Delete characters forward until encountering the end of a word.
+With argument, do this that many times."
+  (interactive "p")
+  (if (use-region-p)
+      (delete-region (region-beginning) (region-end))
+    (delete-region (point) (progn (forward-word arg) (point)))))
+
 (defun back-kill-or-kill-region (arg)
   "Kill the region if active, else backwards kill a word"
   (interactive "p")
   (if (and transient-mark-mode mark-active)
       (kill-region (region-beginning) (region-end))
-    (backward-kill-word arg)))
+    (delete-word (- arg))))
 
 (defun move-end-of-line-or-next-line ()
   (interactive)
@@ -222,8 +232,8 @@
     (set-font-if-exists "Meslo LG S-10.25"))
 
 ;; Theme
-(if (display-graphic-p)
-    (require 'unfucked-solarize))
+;(if (display-graphic-p)
+ ;   (require 'unfucked-solarize))
 
 
 ;; Default frame size
@@ -295,9 +305,9 @@
 (setq neo-theme 'icons)
 (setq inhibit-compacting-font-caches t)
 
-;;(require 'popwin)
+(require 'popwin)
 
-;;(popwin-mode 1)
+(popwin-mode 1)
 
 
 ;; Tabbar
@@ -313,15 +323,14 @@
   (define-key helm-find-files-map (kbd "C-w")
     'helm-find-files-up-one-level))
 
-(with-eval-after-load "helm-grep"
-  (dolist (map (list helm-grep-map helm-pdfgrep-map))
-    (define-key map (kbd "C-w") 'back-kill-or-kill-region)))
-
 (with-eval-after-load "helm"
   (setq helm-split-window-in-side-p t
         helm-M-x-fuzzy-match t)
   (define-key helm-map (kbd "C-w")
     'back-kill-or-kill-region))
+
+(setq helm-ag-base-command "ag --nocolor --nogroup --ignore-case -A 1 -B 1 --break")
+
 
 (eval-after-load 'helm-mode
     '(add-to-list 'helm-completing-read-handlers-alist '(find-file)))
@@ -381,28 +390,6 @@
 
 ;; fix ruby's screwy indentation
 
-(defadvice ruby-indent-line (after unindent-closing-paren activate)
-  (let ((column (current-column))
-        indent offset)
-    (save-excursion
-      (back-to-indentation)
-      (let ((state (syntax-ppss)))
-        (setq offset (- column (current-column)))
-        (when (and (or (eq (char-after) ?\))
-                       (and (eq (char-after) ?\})
-                            (eq (char-after (1+ (point))) ?\))))
-                   (not (zerop (car state))))
-          (goto-char (cadr state))
-          (setq indent (current-indentation)))))
-    (when indent
-      (indent-line-to indent)
-      (when (> offset 0)
-        (forward-char offset)))))
-
-(setq ruby-deep-indent-paren nil
-      ruby-deep-indent-paren-style nil
-      ruby-deep-arglist nil
-      ruby-use-smie nil)
 
 
 ;; Lisp stuff
@@ -456,8 +443,13 @@
 (define-key projectile-mode-map (kbd "C-t")
   'helm-projectile-find-file)
 
+(define-key projectile-mode-map [(meta t)]
+  'helm-projectile-find-file)
+
 (define-key projectile-mode-map [(meta shift f)]
-  'helm-projectile-grep)
+  'helm-projectile-ag)
+
+(setq projectile-globally-ignored-file-suffixes (append '(".xsl" ".xsd" ".pdf" ".jpeg" ".rdb" ".txt" ".md" ".html" ".lock" ".log" ".keep" ".elc" ".jpg" ".png") projectile-globally-ignored-file-suffixes))
 
 (helm-projectile-on)
 
@@ -476,7 +468,7 @@
     ("d677ef584c6dfc0697901a44b885cc18e206f05114c8a3b7fde674fce6180879" "8aebf25556399b58091e533e455dd50a6a9cba958cc4ebb0aab175863c25b9a4" "cd2a93d7b63aff07b3565c1c95e461cb880f0b00d8dd6cdd10fa8ece01ffcfdf" default)))
  '(package-selected-packages
    (quote
-    (memoize font-lock+ queue atom-one-dark-theme adjust-parens)))
+    (pfuture memoize font-lock+ queue atom-one-dark-theme adjust-parens)))
  '(weatherline-location-id 5946768))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.

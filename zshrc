@@ -3,12 +3,14 @@ HISTSIZE=10000
 SAVEHIST=10000
 unsetopt beep
 setopt SH_WORD_SPLIT
+
 export DISABLE_SPRING=1
 export DISABLE_PRY_RAILS=1
 # Seriously, Homebrew?
 export HOMEBREW_NO_ANALYTICS=1
+export JUPITER_DATABASE_URL=postgresql://127.0.0.1
 
-export PATH=/usr/local/bin:/usr/local/sbin:$PATH:/sbin:$HOME/bin
+export PATH=/Applications/Postgres.app/Contents/Versions/9.6/bin:$HOME/.rbenv/bin:/usr/local/bin:/usr/local/sbin:$PATH:/sbin:$HOME/bin
 
 case $TERM in
     screen*)
@@ -38,7 +40,6 @@ alias ccl32='/usr/local/bin/ccl'
 
 export CLICOLOR=1
 export LSCOLORS=ExFxCxDxBxegedabagacad
-export DISABLE_PRY_RAILS=1
 export EDITOR='mg'
 
 function parse_curr_git_branch_name() {
@@ -71,6 +72,5 @@ function precmd() {
     PROMPT="$BOLD%m: %~$RESET$RED$(parse_curr_git_branch_name)$BOLD$ALERT$(git_stash_count)$RESET$BOLD$ALERT$(jobs_count)$RESET$BOLD%(!.#.✨) $RESET "
 }
 
-export PATH="$PATH:$HOME/.rvm/bin" # Add RVM to PATH for scripting
 source ~/.cargo/env
-[[ -s /Users/matt/.rvm/scripts/rvm ]] && source /Users/matt/.rvm/scripts/rvm # Load RVM into a shell session *as a function*
+eval "$(rbenv init -)"

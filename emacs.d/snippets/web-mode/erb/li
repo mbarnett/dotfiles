@@ -1,0 +1,6 @@
+# -*- mode: snippet -*-
+# name: li
+# --
+<li>
+  $0
+</li>

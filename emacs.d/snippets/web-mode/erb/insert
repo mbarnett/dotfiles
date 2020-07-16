@@ -1,0 +1,7 @@
+# -*- mode: snippet -*-
+# name: insert
+# key: =
+# --
+<%= $1 %>
+  $0
+<% end %>
