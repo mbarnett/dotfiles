@@ -6,7 +6,7 @@ setopt SH_WORD_SPLIT
 
 export DISABLE_PRY_RAILS=1
 
-export PATH=/usr/local/bin:/usr/local/sbin:$PATH:/sbin:$HOME/.cargo/bin:$HOME/bin
+export PATH=/usr/local/bin:/usr/local/sbin:$PATH:/sbin:$HOME/.cargo/bin:$HOME/bin:$HOME/.rbenv/bin
 
 export DISABLE_SPRING=true
 
@@ -39,6 +39,18 @@ alias ccl32='/usr/local/bin/ccl'
 export CLICOLOR=1
 export LSCOLORS=ExFxCxDxBxegedabagacad
 export EDITOR='mg'
+
+case "$OSTYPE" in
+  darwin*)
+    export RUBY_CONFIGURE_OPTS="--with-openssl-dir=$(brew --prefix openssl@1.1)"
+    export LDFLAGS="-L/usr/local/opt/postgresql@10/lib"
+    export CPPFLAGS="-I/usr/local/opt/postgresql@10/include"
+    export PATH=$PATH::/usr/local/opt/postgresql@10/bin
+  ;;
+  linux*)
+    alias zyp='zypper'
+  ;;
+esac
 
 function parse_curr_git_branch_name() {
   ref=$(git symbolic-ref HEAD 2> /dev/null) || return
