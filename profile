@@ -1,2 +1,3 @@
 source ~/.zshrc
 source ~/.zlogin
+

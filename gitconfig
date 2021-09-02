@@ -3,8 +3,8 @@
   diff = auto
   status = auto
 [user]
-  name = Matt Barnett
-  email = matt@sixtyodd.com
+	name = Matt Barnett
+	email = matt@sixtyodd.com
 [core]
   editor = mg
   excludesfile = /Users/matt/.gitignore
@@ -28,3 +28,5 @@
 	keepBackup = false
 [push]
 	default = current
+[init]
+	defaultBranch = main
