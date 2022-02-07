@@ -42,9 +42,8 @@ export EDITOR='mg'
 
 case "$OSTYPE" in
   darwin*)
-    export RUBY_CONFIGURE_OPTS="--with-openssl-dir=$(brew --prefix openssl@1.1)"
-    export LDFLAGS="-L/usr/local/opt/postgresql@10/lib"
-    export CPPFLAGS="-I/usr/local/opt/postgresql@10/include"
+    export LDFLAGS="-L/usr/local/opt/postgresql@10/lib -L/usr/local/opt/mysql@5.6/lib"
+    export CPPFLAGS="-I/usr/local/opt/postgresql@10/include -I/usr/local/opt/mysql@5.6/include"
     export PATH=$PATH::/usr/local/opt/postgresql@10/bin
   ;;
   linux*)
@@ -84,27 +83,5 @@ function precmd() {
 
 eval "$(rbenv init -)"
 
-#export NVM_DIR="$HOME/.nvm"
-#[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
-
-# place this after nvm initialization!
-#autoload -U add-zsh-hook
-
-#load-nvmrc() {
-#  local node_version="$(nvm version)"
-#  local nvmrc_path="$(nvm_find_nvmrc)"
-#
-#  if [ -n "$nvmrc_path" ]; then
-#    local nvmrc_node_version=$(nvm version "$(cat "${nvmrc_path}")")
-#
-#    if [ "$nvmrc_node_version" = "N/A" ]; then
-#      nvm install
-#    elif [ "$nvmrc_node_version" != "$node_version" ]; then
-#      nvm use
-#    fi
-#  elif [ "$node_version" != "$(nvm version default)" ]; then
-#    echo "Reverting to nvm default version"
-#    nvm use default
-#}
-#add-zsh-hook chpwd load-nvmrc
-#load-nvmrc
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
