@@ -1,4 +1,4 @@
-HISTFILE=~/.zhistfile
+#HISTFILE=~/.zhistfile
 HISTSIZE=10000
 SAVEHIST=10000
 unsetopt beep
@@ -6,9 +6,12 @@ setopt SH_WORD_SPLIT
 
 export DISABLE_PRY_RAILS=1
 
-export PATH=/usr/local/bin:/usr/local/sbin:$PATH:/sbin:$HOME/.cargo/bin:$HOME/bin:$HOME/.rbenv/bin
+export PATH=$PATH:$HOME/.cargo/bin:$HOME/bin
 
 export DISABLE_SPRING=true
+export HOMEBREW_NO_AUTO_UPDATE=1 
+export HOMEBREW_NO_ANALYTICS=1
+export HOMEBREW_NO_INSTALL_CLEANUP=1
 
 case $TERM in
     screen*)
