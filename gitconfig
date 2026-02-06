@@ -17,7 +17,7 @@
   show-merge = "!sh -c 'merge=$(git find-merge $0 $1) && [ -n \"$merge\" ] && git show $merge'"
 [push]
 	default = current
-	pushoption = u
+  autoSetupRemote = true
 [init]
 	defaultBranch = main
 [mergetool "smerge"]
@@ -27,3 +27,5 @@
 	tool = smerge
 [pull]
 	rebase = false
+[mergetool]
+	keepBackup = false
