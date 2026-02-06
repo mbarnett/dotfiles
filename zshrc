@@ -6,7 +6,7 @@ setopt SH_WORD_SPLIT
 
 export DISABLE_PRY_RAILS=1
 
-export PATH=$PATH:$HOME/.cargo/bin:$HOME/bin
+export PATH=$PATH:$HOME/bin
 
 export DISABLE_SPRING=true
 export HOMEBREW_NO_AUTO_UPDATE=1 
@@ -36,8 +36,8 @@ autoload -U colors && colors
 alias ls='ls -hG'
 alias tmux='tmux -2'
 alias pine='alpine'
-alias ccl='ccl64'
-alias ccl32='/usr/local/bin/ccl'
+# alias ccl='ccl64'
+# alias ccl32='/usr/local/bin/ccl'
 
 export CLICOLOR=1
 export LSCOLORS=ExFxCxDxBxegedabagacad
@@ -45,9 +45,16 @@ export EDITOR='mg'
 
 case "$OSTYPE" in
   darwin*)
-    export LDFLAGS="-L/usr/local/opt/postgresql@10/lib -L/usr/local/opt/mysql@5.6/lib"
-    export CPPFLAGS="-I/usr/local/opt/postgresql@10/include -I/usr/local/opt/mysql@5.6/include"
-    export PATH=$PATH::/usr/local/opt/postgresql@10/bin
+    # export LDFLAGS="-L/usr/local/opt/postgresql@10/lib -L/usr/local/opt/mysql@5.6/lib"
+    # export CPPFLAGS="-I/usr/local/opt/postgresql@10/include -I/usr/local/opt/mysql@5.6/include"
+    # export PATH=$PATH::/usr/local/opt/postgresql@10/bin
+
+    # openssl
+    export PATH="/opt/homebrew/opt/openssl@1.1/bin:$PATH"
+    export LDFLAGS="-L/opt/homebrew/opt/openssl@1.1/lib"
+    export CPPFLAGS="-I/opt/homebrew/opt/openssl@1.1/include"
+    export PKG_CONFIG_PATH="/opt/homebrew/opt/openssl@1.1/lib/pkgconfig"
+    export RUBY_CONFIGURE_OPTS="--with-openssl-dir=/opt/homebrew/opt/openssl@1.1"
   ;;
   linux*)
     alias zyp='zypper'
@@ -84,7 +91,13 @@ function precmd() {
     PROMPT="$BOLD%m: %~$RESET$RED$(parse_curr_git_branch_name)$BOLD$ALERT$(git_stash_count)$RESET$BOLD$ALERT$(jobs_count)$RESET$BOLD%(!.#.✨) $RESET "
 }
 
+eval "$(/opt/homebrew/bin/brew shellenv)"
+
 eval "$(rbenv init -)"
 
 export NVM_DIR="$HOME/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+ [ -s "/opt/homebrew/opt/nvm/nvm.sh" ] && \. "/opt/homebrew/opt/nvm/nvm.sh"  # This loads nvm
+ [ -s "/opt/homebrew/opt/nvm/etc/bash_completion.d/nvm" ] && \. "/opt/homebrew/opt/nvm/etc/bash_completion.d/nvm"  # This loads nvm bash_completion
+
+
+export PATH="/opt/homebrew/opt/postgresql@16/bin:$PATH"
